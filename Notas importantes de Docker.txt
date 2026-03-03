@@ -1,0 +1,51 @@
+Arquitectura de Docker
+
+Docker utiliza una arquitectura de cliente-servidor
+- Docker deamon         
+    -> El daemon (demonio) de Docker es el servicio que se ejecuta en segundo plano en tu máquina. Es responsable de:
+        - Construir imágenes Docker
+        - Ejecutar contenedores
+        - Gestionar volúmenes y redes
+        - Distribuir/descargar imágenes
+
+- Docker client         
+    -> Es la interfaz de línea de comandos (CLI) que usas para interactuar con Docker. Permite:
+        - Enviar comandos al daemon
+        - Gestionar contenedores e imágenes
+        - Descargar y subir imágenes
+
+- Docker registries 
+    -> Son repositorios centralizados donde se almacenan y distribuyen imágenes Docker. El más conocido es Docker Hub, pero también pueden ser:
+        - Registros privados
+        - Registros locales
+
+
+Flujo General
+Usuario → Docker Client → Docker Daemon → Crea/Ejecuta Contenedores
+                              ↓
+                        Docker Registries (descarga/sube imágenes)
+
+(El cliente de Docker habla con el daemon de Docker, que hace el trabajo pesado de construir, ejecutar y distribuir nuestros contenedores.)
+
+El cliente y daemon pueden estar en la misma máquina o conectados remotamente a través de la red. Esto permite flexibilidad en cómo se despliegan y gestionan los contenedores.
+
+
+Imágenes Docker
+Una imagen Docker es una plantilla inmutable que contiene todo lo necesario para ejecutar una aplicación, incluyendo:
+    - Código fuente
+    - Bibliotecas
+    - Dependencias
+    - Configuración
+    - Scripts de inicio
+Las imágenes se construyen a partir de un Dockerfile, que es un archivo de texto con instrucciones para crear la imagen. Cada instrucción en el Dockerfile crea una nueva capa en la imagen, lo que permite reutilizar capas comunes entre diferentes imágenes y optimizar el almacenamiento.
+Las imágenes se pueden compartir a través de registries, lo que facilita la distribución y el despliegue de aplicaciones en diferentes entornos.
+
+
+
+
+
+
+Contenedores
+Un contenedor es una instancia en ejecución de una imagen Docker. Proporciona un entorno aislado para ejecutar aplicaciones, lo que significa que cada contenedor tiene su propio sistema de archivos, red y procesos, pero comparte el kernel del sistema operativo con otros contenedores.
+Los contenedores son efímeros, lo que significa que pueden ser creados, detenidos y eliminados fácilmente. Esto los hace ideales para aplicaciones que necesitan escalar rápidamente o para entornos de desarrollo donde se requiere un ciclo de vida rápido.
+Los contenedores pueden comunicarse entre sí a través de redes Docker, lo que permite la creación de aplicaciones distribuidas y microservicios.
