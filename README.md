@@ -2,37 +2,31 @@
 
 Bienvenido a mi repositorio de notas y prácticas del curso de Docker. Aquí iré documentando los conceptos fundamentales y comandos que vaya aprendiendo.
 
-> **Estado:** 🚧 En construcción / En curso
+> **Estado:** 🚧 En curso
 
 ## 📖 Tabla de Contenidos
 
-1. [Arquitectura de Docker](#arquitectura-de-docker)
-2. [Imágenes](#imágenes)
-3. [Contenedores](#contenedores)
+- [Módulo 1: Entendiendo las imágenes](#módulo-1-entendiendo-las-imágenes)
 
 ---
 
-## Arquitectura de Docker
+## Módulo 1: Entendiendo las imágenes
 
-Docker utiliza una arquitectura **cliente-servidor** que permite flexibilidad en el despliegue.
+En este módulo introductorio, aprendí los conceptos base de la arquitectura de Docker y el ciclo de vida de las imágenes.
 
-*   **Docker Daemon:** El servicio en segundo plano que hace el trabajo pesado (construir, ejecutar, distribuir).
-*   **Docker Client:** La interfaz de línea de comandos (CLI) con la que interactuamos.
-*   **Docker Registries:** Repositorios centralizados (como Docker Hub) para descargar y subir imágenes.
+### 🧠 Conceptos Clave
+- **Arquitectura Cliente-Servidor:** Cómo interactúan el Docker Client, el Daemon y los Registries.
+- **Imágenes vs Contenedores:** La diferencia entre la plantilla inmutable (imagen) y la instancia ejecutable (contenedor).
+- **Dockerfile:** La "receta" para construir imágenes capa por capa.
 
-**Flujo General:**
-`Usuario` → `Cliente` → `Daemon` → `Gestión de Contenedores`
+### 💻 Práctica Realizada
+En la carpeta `1-Entendiendo las imagenes`, creé mi primer `Dockerfile` para configurar un entorno base.
 
-## Imágenes
+**Instrucciones utilizadas:**
+- `FROM`: Para definir la imagen base (Ubuntu 20.04).
+- `ENV`: Para configurar variables de entorno (Zona horaria y modo no interactivo para evitar bloqueos en la instalación).
+- `RUN`: Para ejecutar comandos de instalación (Apache2).
 
-Una imagen es una **plantilla inmutable** que contiene todo lo necesario para ejecutar una aplicación (código, bibliotecas, dependencias, etc.).
-
-*   Se construyen a partir de un archivo de texto llamado `Dockerfile`.
-*   Están compuestas por **capas** para optimizar el almacenamiento y la reutilización.
-
-## Contenedores
-
-Un contenedor es una **instancia en ejecución** de una imagen.
-
-*   **Aislamiento:** Cada contenedor tiene su propio sistema de archivos y red, aunque comparten el kernel del sistema operativo.
-*   **Efímeros:** Son volátiles; se pueden crear, detener y eliminar fácilmente, lo que los hace ideales para escalar aplicaciones.
+### 📄 Recursos
+He recopilado una lista de comandos útiles y definiciones detalladas en el archivo:
+- Notas importantes de Docker.txt
