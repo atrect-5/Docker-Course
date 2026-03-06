@@ -37,15 +37,40 @@ Una imagen Docker es una plantilla inmutable que contiene todo lo necesario para
     - Dependencias
     - Configuración
     - Scripts de inicio
-Las imágenes se construyen a partir de un Dockerfile, que es un archivo de texto con instrucciones para crear la imagen. Cada instrucción en el Dockerfile crea una nueva capa en la imagen, lo que permite reutilizar capas comunes entre diferentes imágenes y optimizar el almacenamiento.
+Las imágenes se construyen a partir de un Dockerfile, que es un archivo de texto con instrucciones para crear la imagen. 
+Cada instrucción en el Dockerfile crea una nueva capa en la imagen, lo que permite reutilizar capas comunes entre diferentes imágenes y optimizar el almacenamiento.
 Las imágenes se pueden compartir a través de registries, lo que facilita la distribución y el despliegue de aplicaciones en diferentes entornos.
 
 
-
-
-
-
 Contenedores
-Un contenedor es una instancia en ejecución de una imagen Docker. Proporciona un entorno aislado para ejecutar aplicaciones, lo que significa que cada contenedor tiene su propio sistema de archivos, red y procesos, pero comparte el kernel del sistema operativo con otros contenedores.
+Un contenedor es una instancia ejecutable de una imagen Docker. Proporciona un entorno aislado para ejecutar aplicaciones, lo que significa que cada contenedor tiene su propio sistema de archivos, red y procesos, pero comparte el kernel del sistema operativo con otros contenedores.
 Los contenedores son efímeros, lo que significa que pueden ser creados, detenidos y eliminados fácilmente. Esto los hace ideales para aplicaciones que necesitan escalar rápidamente o para entornos de desarrollo donde se requiere un ciclo de vida rápido.
 Los contenedores pueden comunicarse entre sí a través de redes Docker, lo que permite la creación de aplicaciones distribuidas y microservicios.
+
+Docker Hub
+Es la plataforma de Docker donde puedes encontrar y compartir imágenes Docker (la version gratuita solo permite una imagen privada, pero las demas son publicas)
+
+
+///////////////// Comando importantes de Docker CLI //////////////////
+
+Docker pull [Nombre imagen] -> Descarga la imagen Docker disponible en Docker Hub con ese nombre
+Docker image ls             -> Lista las imagenes Docker que tienes disponibles
+Docker search [Nombre]      -> Busca imágenes en Docker Hub que coincidan con el nombre proporcionado.
+| more                      -> No es un comando de Docker. Es un "pipe" a otro comando de la terminal que permite ver la salida página por página. Útil cuando la lista de resultados es muy larga.
+
+Docker run [opciones] [IMAGEN] -> Crea y ejecuta un nuevo contenedor a partir de una imagen.
+    -d: Ejecuta el contenedor en segundo plano (modo "detached").
+    -p [puerto_host]:[puerto_contenedor]: Mapea un puerto de tu máquina a un puerto del contenedor.
+    --name [nombre]: Asigna un nombre específico al contenedor.
+
+Docker ps               -> Lista los contenedores que están en ejecución.
+Docker ps -a            -> Lista todos los contenedores (en ejecución y detenidos).
+
+Docker stop [ID/Nombre del contenedor] -> Detiene un contenedor en ejecución.
+Docker start [ID/Nombre del contenedor]-> Inicia un contenedor que fue detenido.
+Docker rm [ID/Nombre del contenedor]   -> Elimina uno o más contenedores.
+Docker rmi [ID/Nombre de la imagen]    -> Elimina una o más imágenes.
+
+Docker exec -it [ID/Nombre] [comando] -> Ejecuta un comando dentro de un contenedor en ejecución. Muy útil para depurar (ej. `docker exec -it mi-contenedor bash`).
+Docker logs [ID/Nombre] -> Muestra la salida (logs) de un contenedor.
+    -f: Sigue la salida de los logs en tiempo real.
