@@ -41,15 +41,36 @@ Las imágenes se construyen a partir de un Dockerfile, que es un archivo de text
 Cada instrucción en el Dockerfile crea una nueva capa en la imagen, lo que permite reutilizar capas comunes entre diferentes imágenes y optimizar el almacenamiento.
 Las imágenes se pueden compartir a través de registries, lo que facilita la distribución y el despliegue de aplicaciones en diferentes entornos.
 
-
 Contenedores
-Un contenedor es una instancia ejecutable de una imagen Docker. Proporciona un entorno aislado para ejecutar aplicaciones, lo que significa que cada contenedor tiene su propio sistema de archivos, red y procesos, pero comparte el kernel del sistema operativo con otros contenedores.
-Los contenedores son efímeros, lo que significa que pueden ser creados, detenidos y eliminados fácilmente. Esto los hace ideales para aplicaciones que necesitan escalar rápidamente o para entornos de desarrollo donde se requiere un ciclo de vida rápido.
-Los contenedores pueden comunicarse entre sí a través de redes Docker, lo que permite la creación de aplicaciones distribuidas y microservicios.
+Un contenedor es una instancia ejecutable de una imagen Docker. 
+- Proporciona un entorno aislado para ejecutar aplicaciones, lo que significa que cada contenedor tiene su propio sistema de archivos, red y procesos, pero comparte el kernel del sistema operativo con otros contenedores.
+- Los contenedores son efímeros, lo que significa que pueden ser creados, detenidos y eliminados fácilmente. 
+Esto los hace ideales para aplicaciones que necesitan escalar rápidamente o para entornos de desarrollo donde se requiere un ciclo de vida rápido.
+- Los contenedores pueden comunicarse entre sí a través de redes Docker, lo que permite la creación de aplicaciones distribuidas y microservicios.
 
 Docker Hub
 Es la plataforma de Docker donde puedes encontrar y compartir imágenes Docker (la version gratuita solo permite una imagen privada, pero las demas son publicas)
 
+//// Creando nuestra imagen ////
+
+La manera para construir un contenedor en Docker es la siguiente:
+Se Define el Dockerfile → Construimos la imagen → Creamos un contenedor a partir de la imagen → Ejecutamos el contenedor
+
+Primero se debe crear el Dockerfile, en este se definen las instrucciones para construir la imagen.
+Para crear un Dockerfile se debe crear un archivo sin extencion, normalmente es llamado Dockerfile (con "D" mayuscula). 
+El nombre del archivo puede indicar tambien para que se utilizara (Dockerfile.dev, Dockerfile.prod, etc). 
+
+Una vez que se crea el archivo con el script para generar la imagen, se debe ejecutar el comando "docker build".
+Esto creara la imagen docker a partir del Dockerfile.
+
+Cuando termine de crear la imagen, puedes comprobarlo con el comando "docker images / docker image ls".
+O también puedes visualizar la nueva imagen creada en Docker Desktop.
+
+///////////////// Palabras clave del Dockerfile //////////////////
+
+FROM    -> Define la imagen base a partir de la cual se construirá la nueva imagen. Es obligatorio definirla.
+ENV    -> Establece variables de entorno dentro de la imagen. Estas variables estarán disponibles para los procesos que se ejecuten dentro del contenedor.
+RUN     -> Ejecuta un comando en la terminal durante el proceso de construcción de la imagen.
 
 ///////////////// Comando importantes de Docker CLI //////////////////
 
@@ -58,10 +79,20 @@ Docker image ls             -> Lista las imagenes Docker que tienes disponibles
 Docker search [Nombre]      -> Busca imágenes en Docker Hub que coincidan con el nombre proporcionado.
 | more                      -> No es un comando de Docker. Es un "pipe" a otro comando de la terminal que permite ver la salida página por página. Útil cuando la lista de resultados es muy larga.
 
+Docker build -t [nombre:tag] . -> Construye una imagen a partir de un Dockerfile en el directorio actual (indicado por el punto final).
+    -t [nombre:tag]: Asigna un nombre y una versión (tag) a la imagen (ej. `mi-app:v1`). 
+                     Si omites el tag (ej. `docker build -t mi-app .`), Docker usará `latest` por defecto.
+
 Docker run [opciones] [IMAGEN] -> Crea y ejecuta un nuevo contenedor a partir de una imagen.
     -d: Ejecuta el contenedor en segundo plano (modo "detached").
     -p [puerto_host]:[puerto_contenedor]: Mapea un puerto de tu máquina a un puerto del contenedor.
     --name [nombre]: Asigna un nombre específico al contenedor.
+
+Docker images           -> Lista las imágenes Docker disponibles en tu máquina.
+Docker image ls         -> Lista las imágenes Docker disponibles en tu máquina.
+    --all o -a: Muestra todas las imágenes, incluyendo las intermedias que no tienen etiquetas.
+    --filter [filtro]: Permite filtrar las imágenes por nombre, etiqueta, etc. (ej. `docker image ls / docker images --filter=reference='mi-app*'`).
+    --format [formato]: Personaliza la salida de la lista de imágenes usando un formato específico (ej. `docker image ls / docker images --format "{{.Repository}}:{{.Tag}}"`).
 
 Docker ps               -> Lista los contenedores que están en ejecución.
 Docker ps -a            -> Lista todos los contenedores (en ejecución y detenidos).
