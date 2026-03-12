@@ -60,11 +60,18 @@ Primero se debe crear el Dockerfile, en este se definen las instrucciones para c
 Para crear un Dockerfile se debe crear un archivo sin extencion, normalmente es llamado Dockerfile (con "D" mayuscula). 
 El nombre del archivo puede indicar tambien para que se utilizara (Dockerfile.dev, Dockerfile.prod, etc). 
 
-Una vez que se crea el archivo con el script para generar la imagen, se debe ejecutar el comando "docker build".
+Una vez que se crea el archivo con el script para generar la imagen, se debe ejecutar el comando "docker build" (Checar comandos importantes de Docker CLI).
 Esto creara la imagen docker a partir del Dockerfile.
 
-Cuando termine de crear la imagen, puedes comprobarlo con el comando "docker images / docker image ls".
+Cuando termine de crear la imagen, puedes comprobarlo con el comando "docker images / docker image ls" (Checar comandos importantes de Docker CLI).
 O también puedes visualizar la nueva imagen creada en Docker Desktop.
+
+//// Creando nuestro contenedor ////
+
+Una vez creada nuestra imagen, la usaremos para crear nuestro contenedor.
+Para esto, debemos ejecutar el comando "docker run" (Checar comandos importantes de Docker CLI).
+Cuando ejecutamos este comando, se nos muestra el ID del contenedor que se ha creado.
+Si queremos comprobar que el contenedor se ha creado correctamente, podemos ejecutar el comando "docker ps" (Checar comandos importantes de Docker CLI).
 
 ///////////////// Palabras clave del Dockerfile //////////////////
 
@@ -88,7 +95,6 @@ Docker run [opciones] [IMAGEN] -> Crea y ejecuta un nuevo contenedor a partir de
     -p [puerto_host]:[puerto_contenedor]: Mapea un puerto de tu máquina a un puerto del contenedor.
     --name [nombre]: Asigna un nombre específico al contenedor.
 
-Docker images           -> Lista las imágenes Docker disponibles en tu máquina.
 Docker image ls         -> Lista las imágenes Docker disponibles en tu máquina.
     --all o -a: Muestra todas las imágenes, incluyendo las intermedias que no tienen etiquetas.
     --filter [filtro]: Permite filtrar las imágenes por nombre, etiqueta, etc. (ej. `docker image ls / docker images --filter=reference='mi-app*'`).
