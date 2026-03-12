@@ -19,14 +19,13 @@ En este módulo introductorio, aprendí los conceptos base de la arquitectura de
 - **Imágenes vs Contenedores:** La diferencia entre la plantilla inmutable (imagen) y la instancia ejecutable (contenedor).
 - **Dockerfile:** La "receta" para construir imágenes capa por capa.
 
-### 💻 Práctica Realizada
-En la carpeta `1-Entendiendo las imagenes`, creé mi primer `Dockerfile` para configurar un entorno base.
-
-**Instrucciones utilizadas:**
-- `FROM`: Para definir la imagen base (Ubuntu 20.04).
-- `ENV`: Para configurar variables de entorno (Zona horaria y modo no interactivo para evitar bloqueos en la instalación).
-- `RUN`: Para ejecutar comandos de instalación (Apache2).
+### 📝 Instrucciones Clave del Dockerfile
+Estas son las instrucciones principales que he aprendido para construir imágenes:
+- `FROM`: Define la imagen base.
+- `ENV`: Configura variables de entorno.
+- `RUN`: Ejecuta comandos durante la construcción de la imagen.
+- `CMD`: Especifica el comando por defecto a ejecutar cuando el contenedor inicia.
 
 ### 📄 Recursos
-He recopilado una lista de comandos útiles y definiciones detalladas en el archivo:
-- Notas importantes de Docker.txt
+He recopilado una lista detallada de comandos de la CLI y definiciones de las instrucciones del Dockerfile en el siguiente archivo:
+- **Notas importantes de Docker.txt**
