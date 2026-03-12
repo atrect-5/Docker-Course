@@ -63,6 +63,8 @@ El nombre del archivo puede indicar tambien para que se utilizara (Dockerfile.de
 Una vez que se crea el archivo con el script para generar la imagen, se debe ejecutar el comando "docker build" (Checar comandos importantes de Docker CLI).
 Esto creara la imagen docker a partir del Dockerfile.
 
+Nota: Cada que se actualice el Dockerfile, se debe volver a ejecutar el comando "docker build" para que se actualice la imagen con los cambios realizados en el Dockerfile.
+
 Cuando termine de crear la imagen, puedes comprobarlo con el comando "docker images / docker image ls" (Checar comandos importantes de Docker CLI).
 O también puedes visualizar la nueva imagen creada en Docker Desktop.
 
@@ -73,11 +75,13 @@ Para esto, debemos ejecutar el comando "docker run" (Checar comandos importantes
 Cuando ejecutamos este comando, se nos muestra el ID del contenedor que se ha creado.
 Si queremos comprobar que el contenedor se ha creado correctamente, podemos ejecutar el comando "docker ps" (Checar comandos importantes de Docker CLI).
 
+Nota: Cuando se actualiza la imagen, se debe eliminar el contenedor creado anteriormente para crear uno nuevo con la nueva imagen actualizada.
+
 ///////////////// Palabras clave del Dockerfile //////////////////
 
-FROM    -> Define la imagen base a partir de la cual se construirá la nueva imagen. Es obligatorio definirla.
-ENV    -> Establece variables de entorno dentro de la imagen. Estas variables estarán disponibles para los procesos que se ejecuten dentro del contenedor.
-RUN     -> Ejecuta un comando en la terminal durante el proceso de construcción de la imagen.
+FROM    -> Define la imagen base (ej. `ubuntu:22.04`) a partir de la cual se construirá la nueva imagen. Es la primera instrucción obligatoria en un Dockerfile.
+ENV     -> Establece variables de entorno (ej. `ENV APP_VERSION=1.0`). Estas variables estarán disponibles durante la construcción y para los procesos que se ejecuten dentro del contenedor.
+RUN     -> Ejecuta un comando en una nueva capa sobre la imagen actual. Se usa para instalar paquetes, compilar código, etc. (ej. `RUN apt-get update && apt-get install -y apache2`).
 
 ///////////////// Comando importantes de Docker CLI //////////////////
 
@@ -86,12 +90,13 @@ Docker image ls             -> Lista las imagenes Docker que tienes disponibles
 Docker search [Nombre]      -> Busca imágenes en Docker Hub que coincidan con el nombre proporcionado.
 | more                      -> No es un comando de Docker. Es un "pipe" a otro comando de la terminal que permite ver la salida página por página. Útil cuando la lista de resultados es muy larga.
 
-Docker build -t [nombre:tag] . -> Construye una imagen a partir de un Dockerfile en el directorio actual (indicado por el punto final).
+Docker build -t [nombre:tag] . -> Construye una imagen a partir de un Dockerfile.
     -t [nombre:tag]: Asigna un nombre y una versión (tag) a la imagen (ej. `mi-app:v1`). 
                      Si omites el tag (ej. `docker build -t mi-app .`), Docker usará `latest` por defecto.
+    . (punto final): Especifica el "contexto de construcción". Es la ruta a un directorio en tu máquina local que contiene el Dockerfile y los archivos necesarios para construir la imagen. El daemon de Docker recibe este contexto para ejecutar la construcción.
 
-Docker run [opciones] [IMAGEN] -> Crea y ejecuta un nuevo contenedor a partir de una imagen.
-    -d: Ejecuta el contenedor en segundo plano (modo "detached").
+Docker run [opciones] [IMAGEN] [COMANDO] -> Crea un nuevo contenedor a partir de una imagen y lo inicia. Si se especifica un [COMANDO], este sobreescribe el `CMD` por defecto de la imagen.
+    -d: Ejecuta el contenedor en segundo plano (modo "detached") e imprime el ID del contenedor.
     -p [puerto_host]:[puerto_contenedor]: Mapea un puerto de tu máquina a un puerto del contenedor.
     --name [nombre]: Asigna un nombre específico al contenedor.
 
@@ -105,8 +110,10 @@ Docker ps -a            -> Lista todos los contenedores (en ejecución y detenid
 
 Docker stop [ID/Nombre del contenedor] -> Detiene un contenedor en ejecución.
 Docker start [ID/Nombre del contenedor]-> Inicia un contenedor que fue detenido.
-Docker rm [ID/Nombre del contenedor]   -> Elimina uno o más contenedores.
-Docker rmi [ID/Nombre de la imagen]    -> Elimina una o más imágenes.
+
+Docker rm [ID/Nombre del contenedor]   -> Elimina uno o más contenedores DETENIDOS.
+    -f: Fuerza la eliminación de un contenedor en ejecución.
+Docker rmi [ID/Nombre de la imagen]    -> Elimina una o más imágenes. Una imagen no puede ser eliminada si un contenedor (incluso detenido) la está usando.
 
 Docker exec -it [ID/Nombre] [comando] -> Ejecuta un comando dentro de un contenedor en ejecución. Muy útil para depurar (ej. `docker exec -it mi-contenedor bash`).
 Docker logs [ID/Nombre] -> Muestra la salida (logs) de un contenedor.
