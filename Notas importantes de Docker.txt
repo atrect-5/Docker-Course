@@ -75,13 +75,17 @@ Para esto, debemos ejecutar el comando "docker run" (Checar comandos importantes
 Cuando ejecutamos este comando, se nos muestra el ID del contenedor que se ha creado.
 Si queremos comprobar que el contenedor se ha creado correctamente, podemos ejecutar el comando "docker ps" (Checar comandos importantes de Docker CLI).
 
-Nota: Cuando se actualiza la imagen, se debe eliminar el contenedor creado anteriormente para crear uno nuevo con la nueva imagen actualizada.
+Nota: Cuando se actualiza la imagen, se debe crear uno nuevo con la nueva imagen actualizada.
 
 ///////////////// Palabras clave del Dockerfile //////////////////
 
 FROM    -> Define la imagen base (ej. `ubuntu:22.04`) a partir de la cual se construirá la nueva imagen. Es la primera instrucción obligatoria en un Dockerfile.
 ENV     -> Establece variables de entorno (ej. `ENV APP_VERSION=1.0`). Estas variables estarán disponibles durante la construcción y para los procesos que se ejecuten dentro del contenedor.
 RUN     -> Ejecuta un comando en una nueva capa sobre la imagen actual. Se usa para instalar paquetes, compilar código, etc. (ej. `RUN apt-get update && apt-get install -y apache2`).
+CMD     -> Proporciona un comando y/o parámetros por defecto para un contenedor en ejecución. Estos parámetros pueden ser sobreescritos fácilmente al ejecutar `docker run`. Solo la última instrucción `CMD` en un Dockerfile tiene efecto.
+            -> Existen dos formas de usar CMD: Shell form y Exec form.
+            -> Shell form: CMD command param1 param2 (ej. CMD echo "Hola Mundo"). Ejecuta el comando a través de un shell (/bin/sh -c), lo que permite usar variables de entorno y redirecciones, pero inicia un proceso adicional.
+            -> Exec form: CMD ["executable","param1","param2"] (ej. CMD ["apache2ctl", "-D", "FOREGROUND"]). Ejecuta el comando directamente sin shell intermedio, lo que es más eficiente y evita problemas con señales. Es recomendado para procesos que deben ser el PID 1 del contenedor.
 
 ///////////////// Comando importantes de Docker CLI //////////////////
 
@@ -106,7 +110,9 @@ Docker image ls         -> Lista las imágenes Docker disponibles en tu máquina
     --format [formato]: Personaliza la salida de la lista de imágenes usando un formato específico (ej. `docker image ls / docker images --format "{{.Repository}}:{{.Tag}}"`).
 
 Docker ps               -> Lista los contenedores que están en ejecución.
-Docker ps -a            -> Lista todos los contenedores (en ejecución y detenidos).
+    --all o -a: Lista todos los contenedores (en ejecución y detenidos).
+    --no-trunc: Muestra los IDs completos de los contenedores en lugar de truncarlos.
+Docker container ls    -> Lista los contenedores que están en ejecución.
 
 Docker stop [ID/Nombre del contenedor] -> Detiene un contenedor en ejecución.
 Docker start [ID/Nombre del contenedor]-> Inicia un contenedor que fue detenido.
@@ -118,3 +124,6 @@ Docker rmi [ID/Nombre de la imagen]    -> Elimina una o más imágenes. Una imag
 Docker exec -it [ID/Nombre] [comando] -> Ejecuta un comando dentro de un contenedor en ejecución. Muy útil para depurar (ej. `docker exec -it mi-contenedor bash`).
 Docker logs [ID/Nombre] -> Muestra la salida (logs) de un contenedor.
     -f: Sigue la salida de los logs en tiempo real.
+
+Docker system prune -> Elimina todos los contenedores detenidos, redes no utilizadas, imágenes "dangling" (sin etiqueta) y la caché de construcción.
+    -a: Elimina también todas las imágenes no utilizadas (no solo las dangling).
