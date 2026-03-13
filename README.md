@@ -25,6 +25,7 @@ Estas son las instrucciones principales que he aprendido para construir imágene
 - `ENV`: Configura variables de entorno.
 - `RUN`: Ejecuta comandos durante la construcción de la imagen.
 - `CMD`: Especifica el comando por defecto a ejecutar cuando el contenedor inicia.
+- `COPY`: Copia archivos/directorios desde el host al sistema de archivos de la imagen.
 
 ### 📄 Recursos
 He recopilado una lista detallada de comandos de la CLI y definiciones de las instrucciones del Dockerfile en el siguiente archivo:
