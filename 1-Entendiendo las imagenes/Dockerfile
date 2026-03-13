@@ -11,6 +11,10 @@ ENV TZ=America/Mexico_City
 #En este caso, actualizamos los repositorios e instalamos el servidor web Apache.
 RUN apt-get update && apt-get install -y apache2
 
+#Con COPY, copiamos archivos o directorios desde el contexto de construcción (nuestra máquina) al sistema de archivos de la imagen.
+#Aquí, copiamos nuestra página de prueba al directorio por defecto de Apache en Ubuntu.
+COPY index.html /var/www/html/
+
 #Con CMD, especificamos el comando que se ejecutará cuando se inicie un contenedor a partir de la imagen.
 #En este caso, se ejecutará el comando "apache2ctl -D FOREGROUND" que inicia el servidor web Apache en primer plano. 
     #Esto es importante porque si el proceso principal del contenedor termina, el contenedor se detendrá. 
