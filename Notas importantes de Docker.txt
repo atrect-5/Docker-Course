@@ -77,15 +77,25 @@ Si queremos comprobar que el contenedor se ha creado correctamente, podemos ejec
 
 Nota: Cuando se actualiza la imagen, se debe crear uno nuevo con la nueva imagen actualizada.
 
-///////////////// Palabras clave del Dockerfile //////////////////
+///////////////// Dockerfile Instructions //////////////////
 
 FROM    -> Define la imagen base (ej. `ubuntu:22.04`) a partir de la cual se construirá la nueva imagen. Es la primera instrucción obligatoria en un Dockerfile.
+LABEL   -> Añade metadatos a la imagen mediante pares clave-valor (ej. `LABEL version="1.0" maintainer="alex@example.com"`). Útil para documentar, organizar o añadir licencias a las imágenes.
+WORKDIR -> Establece el directorio de trabajo para cualquier instrucción `RUN`, `CMD`, `ENTRYPOINT`, `COPY` y `ADD` que le siga. Si no existe, se creará.
 ENV     -> Establece variables de entorno (ej. `ENV APP_VERSION=1.0`). Estas variables estarán disponibles durante la construcción y para los procesos que se ejecuten dentro del contenedor.
+USER    -> Establece el nombre de usuario (o UID) y opcionalmente el grupo (GID) que se utilizará para ejecutar las instrucciones siguientes (`RUN`, `CMD`, `ENTRYPOINT`) y al iniciar el contenedor. Es buena práctica para evitar ejecutar todo como root.
 RUN     -> Ejecuta un comando en una nueva capa sobre la imagen actual. Se usa para instalar paquetes, compilar código, etc. (ej. `RUN apt-get update && apt-get install -y apache2`).
+COPY    -> Copia archivos o directorios desde el contexto de construcción (tu máquina) al sistema de archivos del contenedor (ej. `COPY ./mi-app /usr/src/app`).
+ADD     -> Similar a `COPY`, pero con funcionalidades extra como la descompresión automática de archivos `tar` y la capacidad de usar URLs como origen. Se recomienda preferir `COPY` a menos que necesites estas funcionalidades específicas.
+VOLUME  -> Crea un punto de montaje con el nombre especificado y lo marca para contener volúmenes montados externamente. Se usa para almacenamiento persistente de datos. (ej. `VOLUME ["/data"]`).
+EXPOSE  -> Informa a Docker que el contenedor escucha en los puertos de red especificados en tiempo de ejecución. No publica el puerto, solo funciona como documentación entre el creador de la imagen y el que la ejecuta. (ej. `EXPOSE 80`).
 CMD     -> Proporciona un comando y/o parámetros por defecto para un contenedor en ejecución. Estos parámetros pueden ser sobreescritos fácilmente al ejecutar `docker run`. Solo la última instrucción `CMD` en un Dockerfile tiene efecto.
             -> Existen dos formas de usar CMD: Shell form y Exec form.
             -> Shell form: CMD command param1 param2 (ej. CMD echo "Hola Mundo"). Ejecuta el comando a través de un shell (/bin/sh -c), lo que permite usar variables de entorno y redirecciones, pero inicia un proceso adicional.
             -> Exec form: CMD ["executable","param1","param2"] (ej. CMD ["apache2ctl", "-D", "FOREGROUND"]). Ejecuta el comando directamente sin shell intermedio, lo que es más eficiente y evita problemas con señales. Es recomendado para procesos que deben ser el PID 1 del contenedor.
+ENTRYPOINT -> Configura un contenedor para que se ejecute como un ejecutable. A diferencia de `CMD`, los argumentos pasados a `docker run` se añaden después del `ENTRYPOINT`. Es más difícil de sobreescribir que `CMD`. Se usa a menudo en combinación con `CMD` para definir parámetros por defecto que pueden ser modificados.
+            -> Exec form (recomendada): ENTRYPOINT ["executable", "param1"]
+            -> Shell form: ENTRYPOINT command param1
 
 ///////////////// Comando importantes de Docker CLI //////////////////
 
