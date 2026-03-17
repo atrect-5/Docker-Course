@@ -11,14 +11,23 @@ ENV TZ=America/Mexico_City
 #En este caso, actualizamos los repositorios e instalamos el servidor web Apache.
 RUN apt-get update && apt-get install -y apache2
 
+# Con WORKDIR, establecemos el directorio de trabajo para las instrucciones RUN, CMD, ENTRYPOINT, COPY y ADD que sigan en el Dockerfile.
+# Si el directorio no existe, se creará. Esto ayuda a mantener el Dockerfile más limpio y legible.
+WORKDIR /var/www/html
+
 # Definimos una variable de entorno que se usará para generar una nueva página.
 ENV SALUDO="Hola, esta es una página de prueba para entender las varibles de entorno en Docker."
 # Creamos un archivo HTML ('variable.html') utilizando el contenido de la variable de entorno SALUDO.
-RUN echo $SALUDO > /var/www/html/variable.html
+RUN echo $SALUDO > variable.html
 
 #Con COPY, copiamos archivos o directorios desde el contexto de construcción (nuestra máquina) al sistema de archivos de la imagen.
 #Aquí, copiamos nuestra página de prueba al directorio por defecto de Apache en Ubuntu.
-COPY index.html /var/www/html/
+COPY index.html .
+
+# Con EXPOSE, informamos a Docker que el contenedor escuchará en los puertos de red especificados en tiempo de ejecución.
+# Esta instrucción no publica el puerto, solo funciona como un tipo de documentación entre la persona que construye la imagen y la persona que ejecuta el contenedor.
+# Apache escucha en el puerto 80 por defecto.
+EXPOSE 80
 
 #Con CMD, especificamos el comando que se ejecutará cuando se inicie un contenedor a partir de la imagen.
 #En este caso, se ejecutará el comando "apache2ctl -D FOREGROUND" que inicia el servidor web Apache en primer plano. 
