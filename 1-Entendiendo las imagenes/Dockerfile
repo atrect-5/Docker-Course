@@ -11,6 +11,11 @@ ENV TZ=America/Mexico_City
 #En este caso, actualizamos los repositorios e instalamos el servidor web Apache.
 RUN apt-get update && apt-get install -y apache2
 
+# Definimos una variable de entorno que se usará para generar una nueva página.
+ENV SALUDO="Hola, esta es una página de prueba para entender las varibles de entorno en Docker."
+# Creamos un archivo HTML ('variable.html') utilizando el contenido de la variable de entorno SALUDO.
+RUN echo $SALUDO > /var/www/html/variable.html
+
 #Con COPY, copiamos archivos o directorios desde el contexto de construcción (nuestra máquina) al sistema de archivos de la imagen.
 #Aquí, copiamos nuestra página de prueba al directorio por defecto de Apache en Ubuntu.
 COPY index.html /var/www/html/
