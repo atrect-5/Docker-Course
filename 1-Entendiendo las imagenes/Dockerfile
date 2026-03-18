@@ -29,6 +29,24 @@ RUN echo $SALUDO > variable.html
 #Aquí, copiamos nuestra página de prueba al directorio por defecto de Apache en Ubuntu.
 COPY index.html .
 
+# Probaremos el como funciona el cambio de usuario
+# Creamos un archivo html ('usuario1.html') para verificar que actualmente somos el usuario root.
+RUN echo "Soy el usuario: $(whoami)" > usuario1.html
+
+# Con USER, establecemos el usuario (y opcionalmente el grupo) para ejecutar las siguientes instrucciones RUN, CMD y ENTRYPOINT.
+# Creamos el usuario 'alex', cambiamos a él y generamos un archivo en /tmp (donde 'alex' sí tiene permisos de escritura).
+RUN useradd alex
+USER alex
+RUN echo "Soy el usuario: $(whoami)" > /tmp/usuario2.html
+
+# Cambiamos de nuevo a root para mover el archivo generado por 'alex' al directorio web protegido.
+USER root
+RUN cp /tmp/usuario2.html ./usuario2.html
+
+# Con VOLUME, creamos un punto de montaje para persistir datos.
+# Esto asegura que los datos en este directorio se guarden en el host, incluso si el contenedor se elimina. Útil para logs o bases de datos.
+VOLUME /var/log/apache2
+
 # Con EXPOSE, informamos a Docker que el contenedor escuchará en los puertos de red especificados en tiempo de ejecución.
 # Esta instrucción no publica el puerto, solo funciona como un tipo de documentación entre la persona que construye la imagen y la persona que ejecuta el contenedor.
 # Apache escucha en el puerto 80 por defecto.
