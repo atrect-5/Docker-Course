@@ -2,6 +2,11 @@
 #En este caso, se está utilizando la imagen oficial de Ubuntu 20.04 como base para construir la nueva imagen.
 FROM ubuntu:20.04
 
+# Con LABEL, añadimos metadatos a la imagen mediante pares clave-valor.
+# Esto es útil para documentar la imagen, como incluir información del autor, versión, licencias, etc.
+LABEL vendor="Alejandro Gonzalez"
+LABEL site="alejandrogonzalez.xwy"
+
 # Con ENV, definimos variables de entorno que estarán disponibles durante el proceso de construcción de la imagen y también en los contenedores que se creen a partir de esta imagen.
 # Evitamos que la instalación pida interacción y configuramos la zona horaria de México
 ENV DEBIAN_FRONTEND=noninteractive
