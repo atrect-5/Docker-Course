@@ -22,10 +22,15 @@ En este módulo introductorio, aprendí los conceptos base de la arquitectura de
 ### 📝 Instrucciones Clave del Dockerfile
 Estas son las instrucciones principales que he aprendido para construir imágenes:
 - `FROM`: Define la imagen base.
+- `LABEL`: Añade metadatos a la imagen (autor, sitio web, etc.).
 - `ENV`: Configura variables de entorno.
+- `WORKDIR`: Establece el directorio de trabajo dentro del contenedor.
 - `RUN`: Ejecuta comandos durante la construcción de la imagen.
-- `CMD`: Especifica el comando por defecto a ejecutar cuando el contenedor inicia.
+- `USER`: Cambia el usuario activo para ejecutar instrucciones (seguridad y permisos).
 - `COPY`: Copia archivos/directorios desde el host al sistema de archivos de la imagen.
+- `VOLUME`: Crea un punto de montaje para persistencia de datos (ej. logs).
+- `EXPOSE`: Documenta el puerto en el que escucha la aplicación.
+- `CMD`: Especifica el comando por defecto a ejecutar cuando el contenedor inicia.
 
 ### 📄 Recursos
 He recopilado una lista detallada de comandos de la CLI y definiciones de las instrucciones del Dockerfile en el siguiente archivo:
@@ -36,7 +41,8 @@ Como parte de la práctica de este módulo, se creó una imagen personalizada de
 
 **Avances Realizados:**
 1.  **`index.html`**: Se creó una página web estática con HTML y CSS interno para ser usada como página de prueba.
-2.  **`Dockerfile`**: Se actualizó el Dockerfile para copiar el `index.html` al directorio web (`/var/www/html/`) del contenedor durante la construcción de la imagen.
+2.  **Variables y Usuarios**: Se implementó lógica en el Dockerfile para generar archivos HTML dinámicamente (`variable.html`, `usuario1.html`, `usuario2.html`) demostrando el uso de `ENV` y el cambio de permisos con `USER`.
+3.  **Configuración del Servidor**: Se definieron metadatos con `LABEL`, un directorio de trabajo con `WORKDIR` y un volumen para logs con `VOLUME`.
 
 #### Cómo Replicar Este Proyecto
 
@@ -68,8 +74,8 @@ Sigue estos pasos para construir la imagen y ejecutar el contenedor en tu propia
 **Paso 3: Verificar el Resultado**
 
 1.  Abre tu navegador web preferido.
-2.  Visita la dirección `http://localhost:8080`.
-3.  Deberías ver la página de prueba personalizada que creamos. ¡Significa que tu servidor Apache dentro del contenedor Docker está funcionando correctamente!
+2.  Visita la dirección `http://localhost:8080`. Deberías ver la página de bienvenida.
+3.  **Prueba los enlaces:** Haz clic en los enlaces de la página para verificar la generación de archivos mediante variables de entorno y los distintos usuarios (`root` y `alex`).
 
 **Paso 4: Detener y Eliminar el Contenedor (Opcional)**
 Cuando hayas terminado de experimentar, puedes detener y eliminar el contenedor para limpiar tu sistema:
