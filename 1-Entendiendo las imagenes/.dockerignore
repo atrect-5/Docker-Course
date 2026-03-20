@@ -1,0 +1,5 @@
+# Este archivo especifica los archivos y directorios que Docker debe ignorar al construir la imagen.
+# Se utiliza para evitar incluir archivos innecesarios o sensibles en la imagen final.
+
+# Por ejemplo: Ignorar el directorio "node_modules" para evitar incluir dependencias de Node.js en la imagen.
+node_modules/

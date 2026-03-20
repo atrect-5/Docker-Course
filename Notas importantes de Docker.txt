@@ -68,6 +68,12 @@ Nota: Cada que se actualice el Dockerfile, se debe volver a ejecutar el comando 
 Cuando termine de crear la imagen, puedes comprobarlo con el comando "docker images / docker image ls" (Checar comandos importantes de Docker CLI).
 O también puedes visualizar la nueva imagen creada en Docker Desktop.
 
+****.dockerignore****
+Es un archivo de texto que se utiliza para especificar qué archivos o directorios deben ser ignorados por Docker al construir una imagen a partir de un Dockerfile.
+Funciona de manera similar a un archivo .gitignore, donde se listan los archivos o directorios que no se deben incluir en el contexto de construcción de la imagen.
+Esto es útil para evitar incluir archivos innecesarios, sensibles o que no son relevantes para la aplicación en la imagen final, lo que puede reducir el tamaño de la imagen y mejorar la seguridad.
+El archivo .dockerignore se coloca en el mismo directorio que el Dockerfile y se utiliza automáticamente durante el proceso de construcción de la imagen para excluir los archivos y directorios especificados.
+
 //// Creando nuestro contenedor ////
 
 Una vez creada nuestra imagen, la usaremos para crear nuestro contenedor.

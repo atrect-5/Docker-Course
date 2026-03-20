@@ -18,6 +18,7 @@ En este módulo introductorio, aprendí los conceptos base de la arquitectura de
 - **Arquitectura Cliente-Servidor:** Cómo interactúan el Docker Client, el Daemon y los Registries.
 - **Imágenes vs Contenedores:** La diferencia entre la plantilla inmutable (imagen) y la instancia ejecutable (contenedor).
 - **Dockerfile:** La "receta" para construir imágenes capa por capa.
+- **.dockerignore:** Archivo para excluir archivos y directorios del contexto de construcción de la imagen, optimizando su tamaño y seguridad.
 
 ### 📝 Instrucciones Clave del Dockerfile
 Estas son las instrucciones principales que he aprendido para construir imágenes:
@@ -40,9 +41,10 @@ He recopilado una lista detallada de comandos de la CLI y definiciones de las in
 Como parte de la práctica de este módulo, se creó una imagen personalizada de Ubuntu con un servidor Apache que sirve una página web estática.
 
 **Avances Realizados:**
-1.  **`index.html`**: Se creó una página web estática con HTML y CSS interno para ser usada como página de prueba.
-2.  **Variables y Usuarios**: Se implementó lógica en el Dockerfile para generar archivos HTML dinámicamente (`variable.html`, `usuario1.html`, `usuario2.html`) demostrando el uso de `ENV` y el cambio de permisos con `USER`.
-3.  **Configuración del Servidor**: Se definieron metadatos con `LABEL`, un directorio de trabajo con `WORKDIR` y un volumen para logs con `VOLUME`.
+1.  **`.dockerignore`**: Se ha añadido un archivo `.dockerignore` para excluir ficheros no necesarios (como `node_modules`) del contexto de construcción, optimizando así el tamaño y la seguridad de la imagen.
+2.  **`index.html`**: Se creó una página web estática con HTML y CSS interno para ser usada como página de prueba.
+3.  **Variables y Usuarios**: Se implementó lógica en el Dockerfile para generar archivos HTML dinámicamente (`variable.html`, `usuario1.html`, `usuario2.html`) demostrando el uso de `ENV` y el cambio de permisos con `USER`.
+4.  **Configuración del Servidor**: Se definieron metadatos con `LABEL`, un directorio de trabajo con `WORKDIR` y un volumen para logs con `VOLUME`.
 
 #### Cómo Replicar Este Proyecto
 
