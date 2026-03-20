@@ -52,7 +52,7 @@ VOLUME /var/log/apache2
 # Apache escucha en el puerto 80 por defecto.
 EXPOSE 80
 
-#Con CMD, especificamos el comando que se ejecutará cuando se inicie un contenedor a partir de la imagen.
+#Con CMD, especificamos el comando que se ejecutará cuando se inicie un contenedor a partir de la imagen. Se pueden ejecutar archivos de script o comandos de shell.
 #En este caso, se ejecutará el comando "apache2ctl -D FOREGROUND" que inicia el servidor web Apache en primer plano. 
     #Esto es importante porque si el proceso principal del contenedor termina, el contenedor se detendrá. 
     #Al mantener Apache en primer plano, aseguramos que el contenedor siga funcionando mientras el servidor web esté activo.
