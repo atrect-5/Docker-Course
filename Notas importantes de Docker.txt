@@ -30,7 +30,7 @@ Usuario → Docker Client → Docker Daemon → Crea/Ejecuta Contenedores
 El cliente y daemon pueden estar en la misma máquina o conectados remotamente a través de la red. Esto permite flexibilidad en cómo se despliegan y gestionan los contenedores.
 
 
-Imágenes Docker
+**Imágenes Docker**
 Una imagen Docker es una plantilla inmutable que contiene todo lo necesario para ejecutar una aplicación, incluyendo:
     - Código fuente
     - Bibliotecas
@@ -41,14 +41,14 @@ Las imágenes se construyen a partir de un Dockerfile, que es un archivo de text
 Cada instrucción en el Dockerfile crea una nueva capa en la imagen, lo que permite reutilizar capas comunes entre diferentes imágenes y optimizar el almacenamiento.
 Las imágenes se pueden compartir a través de registries, lo que facilita la distribución y el despliegue de aplicaciones en diferentes entornos.
 
-Contenedores
+**Contenedores**
 Un contenedor es una instancia ejecutable de una imagen Docker. 
 - Proporciona un entorno aislado para ejecutar aplicaciones, lo que significa que cada contenedor tiene su propio sistema de archivos, red y procesos, pero comparte el kernel del sistema operativo con otros contenedores.
 - Los contenedores son efímeros, lo que significa que pueden ser creados, detenidos y eliminados fácilmente. 
 Esto los hace ideales para aplicaciones que necesitan escalar rápidamente o para entornos de desarrollo donde se requiere un ciclo de vida rápido.
 - Los contenedores pueden comunicarse entre sí a través de redes Docker, lo que permite la creación de aplicaciones distribuidas y microservicios.
 
-Docker Hub
+**Docker Hub**
 Es la plataforma de Docker donde puedes encontrar y compartir imágenes Docker (la version gratuita solo permite una imagen privada, pero las demas son publicas)
 
 //// Creando nuestra imagen ////
@@ -86,7 +86,30 @@ Para esto, debemos ejecutar el comando "docker run" (Checar comandos importantes
 Cuando ejecutamos este comando, se nos muestra el ID del contenedor que se ha creado.
 Si queremos comprobar que el contenedor se ha creado correctamente, podemos ejecutar el comando "docker ps" (Checar comandos importantes de Docker CLI).
 
-Nota: Cuando se actualiza la imagen, se debe crear uno nuevo con la nueva imagen actualizada.
+Se pueden crear multiples contenedores a partir de una sola imagen.
+
+Nota: Cuando se actualiza la imagen, se debe crear un nuevo contenedor con la nueva imagen actualizada.
+
+****Puertos****
+Cuando se crea un contenedor, este tiene su propia red interna y no es accesible desde el exterior por defecto.
+Para hacer que el contenedor sea accesible desde el exterior, se deben mapear los puertos del contenedor a los puertos de la máquina host utilizando la opción `-p` al ejecutar `docker run` (ej. `docker run -p 8080:80 mi-imagen`). 
+Esto permite que las solicitudes que lleguen al puerto 8080 de la máquina host sean redirigidas al puerto 80 del contenedor, donde la aplicación está escuchando.
+
+****Nombre del contenedor****
+Es recomendable asignar un nombre específico a cada contenedor utilizando la opción `--name` al ejecutar `docker run` (ej. `docker run --name mi-contenedor mi-imagen`).
+Si no se asigna un nombre, Docker generará uno aleatorio para el contenedor, lo que puede dificultar su identificación y gestión, especialmente si tienes varios contenedores en ejecución.
+Esto facilita la gestión de los contenedores, ya que puedes referirte a ellos por nombre en lugar de usar el ID del contenedor, que es más difícil de recordar y manejar.
+Si necesitas cambiar el nombre de un contenedor después de haberlo creado, puedes usar el comando `docker rename` (ej. `docker rename mi-contenedor nuevo-nombre`).
+
+****Volumenes****
+Los volúmenes en Docker son una forma de persistir datos generados y utilizados por los contenedores.
+Un volumen es un directorio en el sistema de archivos del host que se monta dentro del contenedor, lo que permite que los datos persistan incluso después de que el contenedor se detenga o elimine.
+Los volúmenes son útiles para almacenar datos que deben sobrevivir al ciclo de vida de un contenedor, como bases de datos, archivos de configuración o cualquier otro tipo de datos que la aplicación necesite conservar.
+Para crear un volumen, puedes usar el comando `docker volume create` (ej. `docker volume create mi-volumen`).
+Una vez creado el volumen, puedes montarlo en un contenedor usando la opción `-v` al ejecutar `docker run` (ej. `docker run -v mi-volumen:/data mi-imagen`), lo que montará el volumen `mi-volumen` en el directorio `/data` dentro del contenedor.
+
+NOTA: La instrucción `VOLUME` en el `Dockerfile` crea un "punto de montaje" que genera un volumen anónimo automáticamente si el usuario no especifica uno al correr el contenedor; es útil para asegurar que los datos no se pierdan por descuido. 
+Por el contrario, usar la CLI (`docker run -v` o `docker volume create`) permite crear **volúmenes con nombre** o **bind mounts** (mapeo directo a carpetas del host), lo cual es mejor para tener control sobre dónde residen los datos físicamente y para compartirlos fácilmente entre diferentes contenedores.
 
 ///////////////// Dockerfile Instructions //////////////////
 
@@ -110,6 +133,8 @@ ENTRYPOINT -> Configura un contenedor para que se ejecute como un ejecutable. A 
 
 ///////////////// Comando importantes de Docker CLI //////////////////
 
+Para ver todos los posibles comandos de Docker, puedes ejecutar `docker --help` o `docker [comando] --help` para obtener información específica sobre un comando y sus opciones.
+
 Docker pull [Nombre imagen] -> Descarga la imagen Docker disponible en Docker Hub con ese nombre
 Docker image ls             -> Lista las imagenes Docker que tienes disponibles
 Docker search [Nombre]      -> Busca imágenes en Docker Hub que coincidan con el nombre proporcionado.
@@ -124,6 +149,8 @@ Docker run [opciones] [IMAGEN] [COMANDO] -> Crea un nuevo contenedor a partir de
     -d: Ejecuta el contenedor en segundo plano (modo "detached") e imprime el ID del contenedor.
     -p [puerto_host]:[puerto_contenedor]: Mapea un puerto de tu máquina a un puerto del contenedor.
     --name [nombre]: Asigna un nombre específico al contenedor.
+    -v [volumen_host]:[volumen_contenedor]: Monta un volumen del host en el contenedor para persistencia de datos.
+Docker rename [ID/Nombre actual] [Nuevo nombre] -> Cambia el nombre de un contenedor existente.
 
 Docker image ls         -> Lista las imágenes Docker disponibles en tu máquina.
     --all o -a: Muestra todas las imágenes, incluyendo las intermedias que no tienen etiquetas.
@@ -137,6 +164,7 @@ Docker container ls    -> Lista los contenedores que están en ejecución.
 
 Docker stop [ID/Nombre del contenedor] -> Detiene un contenedor en ejecución.
 Docker start [ID/Nombre del contenedor]-> Inicia un contenedor que fue detenido.
+Docker restart [ID/Nombre del contenedor] -> Reinicia un contenedor en ejecución.
 
 Docker rm [ID/Nombre del contenedor]   -> Elimina uno o más contenedores DETENIDOS.
     -f: Fuerza la eliminación de un contenedor en ejecución.
@@ -148,3 +176,18 @@ Docker logs [ID/Nombre] -> Muestra la salida (logs) de un contenedor.
 
 Docker system prune -> Elimina todos los contenedores detenidos, redes no utilizadas, imágenes "dangling" (sin etiqueta) y la caché de construcción.
     -a: Elimina también todas las imágenes no utilizadas (no solo las dangling).
+
+**** Volumenes ****
+Docker volume create [nombre_volumen] -> Crea un nuevo volumen con el nombre especificado.
+
+Docker volume ls -> Lista todos los volúmenes disponibles en tu sistema.
+    -q: Muestra solo los nombres de los volúmenes, sin detalles adicionales.
+    -s: Muestra el tamaño de cada volumen en la lista.
+
+Docker volume inspect [nombre_volumen] -> Muestra detalles sobre un volumen específico, como su ubicación en el host y los contenedores que lo están utilizando.
+    -f: Muestra solo la información específica que deseas
+
+Docker volume rm [nombre_volumen] -> Elimina un volumen específico. Ten en cuenta que solo puedes eliminar un volumen si no está siendo utilizado por ningún contenedor.
+    -f: Fuerza la eliminación del volumen incluso si está siendo utilizado por un contenedor (no recomendado, ya que puede causar problemas de datos).
+
+Docker volume prune -> Elimina todos los volúmenes que no están siendo utilizados por ningún contenedor. Este comando es útil para limpiar volúmenes no utilizados y liberar espacio en tu sistema.
