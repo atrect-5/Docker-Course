@@ -171,6 +171,8 @@ Docker rm [ID/Nombre del contenedor]   -> Elimina uno o más contenedores DETENI
 Docker rmi [ID/Nombre de la imagen]    -> Elimina una o más imágenes. Una imagen no puede ser eliminada si un contenedor (incluso detenido) la está usando.
 
 Docker exec -it [ID/Nombre] [comando] -> Ejecuta un comando dentro de un contenedor en ejecución. Muy útil para depurar (ej. `docker exec -it mi-contenedor bash`).
+    -i: Mantiene la sesión interactiva abierta.
+    -t: Asigna una terminal TTY para que puedas interactuar con el contenedor
 Docker logs [ID/Nombre] -> Muestra la salida (logs) de un contenedor.
     -f: Sigue la salida de los logs en tiempo real.
 
