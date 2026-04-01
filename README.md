@@ -190,6 +190,31 @@ Implementación de NoSQL y uso del shell moderno `mongosh`.
 
 ---
 
+### 🚀 Práctica: Administración de Usuarios (Dockerfile propio)
+Se trabajó en la seguridad y permisos del contenedor mediante la creación de un usuario no-root dentro de una imagen personalizada.
+
+**Pasos realizados:**
+1.  **Preparación**: Navegar al directorio donde se encuentra el Dockerfile:
+    ```bash
+    cd "2-Trabajando con contenedores"
+    ```
+2.  **Dockerfile**: Se utilizó una base de `ubuntu:latest`, se definió una variable de entorno y se creó el usuario `usuario-prueba`.
+3.  **Construcción**: `docker build -t ubuntu:prueba .`
+4.  **Ejecución**:
+    ```bash
+    docker run -d -it --name ubuntu-test ubuntu:prueba
+    ```
+    *Nota: Se usa `-it` para mantener el proceso de la shell activo en una imagen de SO.*
+5.  **Verificación**:
+    - Acceso por defecto: `docker exec -it ubuntu-test bash` (Inicia sesión como `usuario-prueba`).
+    - Acceso administrativo: 
+      ```bash
+      docker exec -it -u root ubuntu-test bash
+      ```
+      *Esto permite saltar la restricción del usuario por defecto para tareas de mantenimiento.*
+
+---
+
 ### 💡 Lecciones Aprendidas y Tips
 
 - **Documentación en Docker Hub**: Es vital revisar la sección "How to use this image" de cada imagen oficial, ya que ahí se especifican las variables de entorno necesarias (como en MySQL) y los puertos por defecto.
