@@ -215,6 +215,24 @@ Se trabajó en la seguridad y permisos del contenedor mediante la creación de u
 
 ---
 
+### 🚀 Práctica: Limitación de Recursos
+Aprendí a restringir el uso de hardware de los contenedores para asegurar la estabilidad del sistema host y evitar el agotamiento de recursos.
+
+**Pasos realizados:**
+1.  **Monitoreo inicial**: Se revisó el consumo del contenedor `ubuntu-test` (Creado en la práctica anterior) usando `docker stats`. Se observó que, por defecto, el límite de memoria era el total disponible en el host (ej. 7.379GiB).
+2.  **Creación con límites**: Se ejecutó un nuevo contenedor basado en la misma imagen, pero restringiendo su memoria a 100MB usando el flag `-m`.
+    ```bash
+    docker run -d -ti -m "100mb" --name ubuntu-test2 ubuntu:prueba
+    ```
+3.  **Verificación**: Se compararon ambos contenedores en tiempo real:
+    ```bash
+    docker stats ubuntu-test2
+    ```
+
+**Resultado**: El campo `MEM USAGE / LIMIT` confirmó el límite de `100MiB`, demostrando que Docker gestiona correctamente el aislamiento de recursos y evita que un contenedor consuma más de lo asignado.
+
+---
+
 ### 💡 Lecciones Aprendidas y Tips
 
 - **Documentación en Docker Hub**: Es vital revisar la sección "How to use this image" de cada imagen oficial, ya que ahí se especifican las variables de entorno necesarias (como en MySQL) y los puertos por defecto.

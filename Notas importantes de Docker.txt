@@ -111,6 +111,11 @@ Una vez creado el volumen, puedes montarlo en un contenedor usando la opción `-
 NOTA: La instrucción `VOLUME` en el `Dockerfile` crea un "punto de montaje" que genera un volumen anónimo automáticamente si el usuario no especifica uno al correr el contenedor; es útil para asegurar que los datos no se pierdan por descuido. 
 Por el contrario, usar la CLI (`docker run -v` o `docker volume create`) permite crear **volúmenes con nombre** o **bind mounts** (mapeo directo a carpetas del host), lo cual es mejor para tener control sobre dónde residen los datos físicamente y para compartirlos fácilmente entre diferentes contenedores.
 
+****Limitar recursos****
+Es fundamental limitar los recursos (CPU y memoria) que un contenedor puede consumir. Al crear un contenedor, este utiliza por defecto los recursos del host sin restricciones, lo que puede causar problemas si un contenedor consume más de lo debido, especialmente en servidores con recursos limitados o con múltiples contenedores activos.
+Para limitar los recursos, puedes usar opciones específicas al ejecutar `docker run`, como `-m` para limitar la memoria o `--cpus` para limitar el uso de CPU (ej. `docker run -m "100mb" --cpus="1.5" mi-imagen`).
+Esto asegura que cada contenedor solo use los recursos necesarios, evitando que un contenedor acapare toda la memoria o CPU del host, lo que mejora la estabilidad y el rendimiento general del sistema.
+
 ///////////////// Dockerfile Instructions //////////////////
 
 FROM    -> Define la imagen base (ej. `ubuntu:22.04`) a partir de la cual se construirá la nueva imagen. Es la primera instrucción obligatoria en un Dockerfile.
@@ -176,6 +181,8 @@ Docker exec -it [ID/Nombre] [comando] -> Ejecuta un comando dentro de un contene
 Docker logs [ID/Nombre] -> Muestra la salida (logs) de un contenedor.
     -f: Sigue la salida de los logs en tiempo real.
 
+Docker stats [ID/Nombre] -> Muestra en tiempo real el consumo de recursos (CPU, Memoria, Red, I/O) de los contenedores. Si no se especifica nombre, muestra todos los activos.
+
 Docker system prune -> Elimina todos los contenedores detenidos, redes no utilizadas, imágenes "dangling" (sin etiqueta) y la caché de construcción.
     -a: Elimina también todas las imágenes no utilizadas (no solo las dangling).
 
@@ -193,3 +200,21 @@ Docker volume rm [nombre_volumen] -> Elimina un volumen específico. Ten en cuen
     -f: Fuerza la eliminación del volumen incluso si está siendo utilizado por un contenedor (no recomendado, ya que puede causar problemas de datos).
 
 Docker volume prune -> Elimina todos los volúmenes que no están siendo utilizados por ningún contenedor. Este comando es útil para limpiar volúmenes no utilizados y liberar espacio en tu sistema.
+
+**** Comandos de limitacion de recursos en contenedores ****
+
+Comando de ayuda rápida: `docker run --help | grep memo/cpu`
+
+  -m, --memory bytes                     -> Establece el límite de memoria para el contenedor.
+      --memory-reservation bytes         -> Establece la reserva de memoria para el contenedor.
+      --memory-swap bytes                -> Establece el límite de swap para el contenedor.
+      --memory-swappiness int            -> Ajusta la preferencia de swappiness de la memoria del contenedor (0 a 100) (predeterminado 0).
+      
+      --cpus decimal                     -> Limita el número de CPUs que el contenedor puede usar (ej. `--cpus="1.5"` para permitir 1 CPU completo y la mitad de otro).
+  -c, --cpu-shares int                   -> Establece la prioridad de CPU relativa para el contenedor (predeterminado 1024). Un valor más alto significa mayor prioridad. 
+      --cpu-period int                   -> Establece el período de tiempo para la limitación de CPU en microsegundos (predeterminado 100000).
+      --cpu-quota int                    -> Establece la cantidad máxima de CPU que el contenedor puede usar durante el período definido por `--cpu-period`. Por ejemplo, si `--cpu-period=100000` y `--cpu-quota=200000`, el contenedor puede usar hasta 2 CPUs completos. 
+      --cpu-rt-period int                -> Establece el período de tiempo para la limitación de CPU real en microsegundos (predeterminado 100000).
+      --cpu-rt-runtime int               -> Establece el tiempo de ejecución para la limitación de CPU real en microsegundos (predeterminado -1).
+      --cpuset-cpus string               -> Asigna los CPUs específicos que el contenedor puede usar.
+      --cpuset-mems string               -> Asigna las memorias específicas que el contenedor puede usar.
