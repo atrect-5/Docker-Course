@@ -123,6 +123,13 @@ Es fundamental limitar los recursos (CPU y memoria) que un contenedor puede cons
 Para limitar los recursos, puedes usar opciones específicas al ejecutar `docker run`, como `-m` para limitar la memoria o `--cpus` para limitar el uso de CPU (ej. `docker run -m "100mb" --cpus="1.5" mi-imagen`).
 Esto asegura que cada contenedor solo use los recursos necesarios, evitando que un contenedor acapare toda la memoria o CPU del host, lo que mejora la estabilidad y el rendimiento general del sistema.
 
+//// Creando una imagen desde el contenedor ////
+
+Hay ocaciones en las que una vez que se ha creado un contenedor, se le han hecho cambios y se desea crear una imagen a partir de ese contenedor para poder reutilizar esos cambios en otros contenedores.
+Para esto, se debe ejecutar el comando "docker commit" (Checar comandos importantes de Docker CLI).
+Este comando crea una nueva imagen a partir de un contenedor existente, incluyendo todos los cambios realizados en el contenedor.
+Ejemplo: `docker commit mi-contenedor mi-nueva-imagen:tag`
+
 ///////////////// Dockerfile Instructions //////////////////
 
 FROM    -> Define la imagen base (ej. `ubuntu:22.04`) a partir de la cual se construirá la nueva imagen. Es la primera instrucción obligatoria en un Dockerfile.
@@ -194,6 +201,8 @@ Docker system prune -> Elimina todos los contenedores detenidos, redes no utiliz
     -a: Elimina también todas las imágenes no utilizadas (no solo las dangling).
 
 Docker cp [fuente] [destino] -> Copia archivos o directorios entre el host y un contenedor, o entre dos contenedores. 
+
+Docker commit [ID/Nombre del contenedor] [nombre_imagen:tag] -> Crea una nueva imagen a partir de un contenedor existente, incluyendo todos los cambios realizados en el contenedor.
 
 **** Volumenes ****
 Docker volume create [nombre_volumen] -> Crea un nuevo volumen con el nombre especificado.
