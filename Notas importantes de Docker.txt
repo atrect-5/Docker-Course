@@ -111,6 +111,13 @@ Una vez creado el volumen, puedes montarlo en un contenedor usando la opción `-
 NOTA: La instrucción `VOLUME` en el `Dockerfile` crea un "punto de montaje" que genera un volumen anónimo automáticamente si el usuario no especifica uno al correr el contenedor; es útil para asegurar que los datos no se pierdan por descuido. 
 Por el contrario, usar la CLI (`docker run -v` o `docker volume create`) permite crear **volúmenes con nombre** o **bind mounts** (mapeo directo a carpetas del host), lo cual es mejor para tener control sobre dónde residen los datos físicamente y para compartirlos fácilmente entre diferentes contenedores.
 
+****Copiar archivos desde/hacia un contenedor****
+Se pueden copiar archivos desde/hacia un contenedor ya creado.
+Tambien se pueden copiar desde un contenedor a otro contenedor.
+Ejemplos:
+    Ejemplo para copiar un archivo del host al contenedor: `docker cp ./archivo.txt mi-contenedor:/ruta/destino/`
+    Ejemplo para copiar un archivo del contenedor al host: `docker cp mi-contenedor:/ruta/origen/archivo.txt ./`
+
 ****Limitar recursos****
 Es fundamental limitar los recursos (CPU y memoria) que un contenedor puede consumir. Al crear un contenedor, este utiliza por defecto los recursos del host sin restricciones, lo que puede causar problemas si un contenedor consume más de lo debido, especialmente en servidores con recursos limitados o con múltiples contenedores activos.
 Para limitar los recursos, puedes usar opciones específicas al ejecutar `docker run`, como `-m` para limitar la memoria o `--cpus` para limitar el uso de CPU (ej. `docker run -m "100mb" --cpus="1.5" mi-imagen`).
@@ -185,6 +192,8 @@ Docker stats [ID/Nombre] -> Muestra en tiempo real el consumo de recursos (CPU, 
 
 Docker system prune -> Elimina todos los contenedores detenidos, redes no utilizadas, imágenes "dangling" (sin etiqueta) y la caché de construcción.
     -a: Elimina también todas las imágenes no utilizadas (no solo las dangling).
+
+Docker cp [fuente] [destino] -> Copia archivos o directorios entre el host y un contenedor, o entre dos contenedores. 
 
 **** Volumenes ****
 Docker volume create [nombre_volumen] -> Crea un nuevo volumen con el nombre especificado.
