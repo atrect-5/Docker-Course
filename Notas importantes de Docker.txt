@@ -111,6 +111,11 @@ Una vez creado el volumen, puedes montarlo en un contenedor usando la opción `-
 NOTA: La instrucción `VOLUME` en el `Dockerfile` crea un "punto de montaje" que genera un volumen anónimo automáticamente si el usuario no especifica uno al correr el contenedor; es útil para asegurar que los datos no se pierdan por descuido. 
 Por el contrario, usar la CLI (`docker run -v` o `docker volume create`) permite crear **volúmenes con nombre** o **bind mounts** (mapeo directo a carpetas del host), lo cual es mejor para tener control sobre dónde residen los datos físicamente y para compartirlos fácilmente entre diferentes contenedores.
 
+****Sobreescribir el CMD de una imagen sin un Dockerfile****
+El CMD de un Dockerfile se puede sobreescribir al ejecutar un contenedor a partir de una imagen, sin necesidad de modificar el Dockerfile.
+Para esto, se debe ejecutar el comando "docker run" (Checar comandos importantes de Docker CLI) y especificar el nuevo comando al final del comando de ejecución (ej. `docker run mi-imagen echo "Hola Mundo"`).
+Esto ejecutará el comando `echo "Hola Mundo"` en lugar del CMD definido en la imagen, permitiendo flexibilidad para ejecutar diferentes comandos sin necesidad de crear una nueva imagen.
+
 ****Copiar archivos desde/hacia un contenedor****
 Se pueden copiar archivos desde/hacia un contenedor ya creado.
 Tambien se pueden copiar desde un contenedor a otro contenedor.
@@ -162,12 +167,12 @@ Docker search [Nombre]      -> Busca imágenes en Docker Hub que coincidan con e
 Docker build -t [nombre:tag] . -> Construye una imagen a partir de un Dockerfile.
     -t [nombre:tag]: Asigna un nombre y una versión (tag) a la imagen (ej. `mi-app:v1`). 
                      Si omites el tag (ej. `docker build -t mi-app .`), Docker usará `latest` por defecto.
-    . (punto final): Especifica el "contexto de construcción". Es la ruta a un directorio en tu máquina local que contiene el Dockerfile y los archivos necesarios para construir la imagen. El daemon de Docker recibe este contexto para ejecutar la construcción.
+    . (punto final): Especifica el "contexto de construcción". Es la ruta a un directorio en tu máquina local que contiene el Dockerfile y los archivos necesarios para construir la imagen. El daemon de Docker recibe este contexto para ejecutar la construcción (El punto final indica que se busque el Dockerfile en la ruta actual).
 
 Docker run [opciones] [IMAGEN] [COMANDO] -> Crea un nuevo contenedor a partir de una imagen y lo inicia. Si se especifica un [COMANDO], este sobreescribe el `CMD` por defecto de la imagen.
     -d: Ejecuta el contenedor en segundo plano (modo "detached") e imprime el ID del contenedor.
     -p [puerto_host]:[puerto_contenedor]: Mapea un puerto de tu máquina a un puerto del contenedor.
-    --name [nombre]: Asigna un nombre específico al contenedor.
+    --name [nombre]: Asigna un nombre específico al contenedor. Si no se especifica, Docker generará uno aleatorio.
     -v [volumen_host]:[volumen_contenedor]: Monta un volumen del host en el contenedor para persistencia de datos.
 Docker rename [ID/Nombre actual] [Nuevo nombre] -> Cambia el nombre de un contenedor existente.
 
