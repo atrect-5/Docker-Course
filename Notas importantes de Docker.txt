@@ -128,6 +128,10 @@ Es fundamental limitar los recursos (CPU y memoria) que un contenedor puede cons
 Para limitar los recursos, puedes usar opciones específicas al ejecutar `docker run`, como `-m` para limitar la memoria o `--cpus` para limitar el uso de CPU (ej. `docker run -m "100mb" --cpus="1.5" mi-imagen`).
 Esto asegura que cada contenedor solo use los recursos necesarios, evitando que un contenedor acapare toda la memoria o CPU del host, lo que mejora la estabilidad y el rendimiento general del sistema.
 
+****Destruir contenedores automaticamente****
+Si un contenedor es efímero y no necesitas que persista después de su ejecución, puedes usar la opción `--rm` al ejecutar el contenedor (ej. `docker run --rm mi-imagen`).
+Esto hará que el contenedor se elimine automáticamente una vez que se detenga, lo que es útil para tareas temporales o de prueba, evitando la acumulación de contenedores detenidos que ocupan espacio y recursos en tu sistema.
+
 //// Creando una imagen desde el contenedor ////
 
 Hay ocaciones en las que una vez que se ha creado un contenedor, se le han hecho cambios y se desea crear una imagen a partir de ese contenedor para poder reutilizar esos cambios en otros contenedores.
@@ -174,6 +178,7 @@ Docker run [opciones] [IMAGEN] [COMANDO] -> Crea un nuevo contenedor a partir de
     -p [puerto_host]:[puerto_contenedor]: Mapea un puerto de tu máquina a un puerto del contenedor.
     --name [nombre]: Asigna un nombre específico al contenedor. Si no se especifica, Docker generará uno aleatorio.
     -v [volumen_host]:[volumen_contenedor]: Monta un volumen del host en el contenedor para persistencia de datos.
+    --rm: Elimina automáticamente el contenedor cuando se detiene. Útil para contenedores efímeros que no necesitan persistir después de su ejecución.
 Docker rename [ID/Nombre actual] [Nuevo nombre] -> Cambia el nombre de un contenedor existente.
 
 Docker image ls         -> Lista las imágenes Docker disponibles en tu máquina.
