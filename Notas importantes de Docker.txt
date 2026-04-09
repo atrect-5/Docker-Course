@@ -163,71 +163,73 @@ ENTRYPOINT -> Configura un contenedor para que se ejecute como un ejecutable. A 
 
 Para ver todos los posibles comandos de Docker, puedes ejecutar `docker --help` o `docker [comando] --help` para obtener información específica sobre un comando y sus opciones.
 
-Docker pull [Nombre imagen] -> Descarga la imagen Docker disponible en Docker Hub con ese nombre
-Docker image ls             -> Lista las imagenes Docker que tienes disponibles
-Docker search [Nombre]      -> Busca imágenes en Docker Hub que coincidan con el nombre proporcionado.
+docker pull [Nombre imagen] -> Descarga la imagen Docker disponible en Docker Hub con ese nombre
+docker image ls             -> Lista las imagenes Docker que tienes disponibles
+docker search [Nombre]      -> Busca imágenes en Docker Hub que coincidan con el nombre proporcionado.
 | more                      -> No es un comando de Docker. Es un "pipe" a otro comando de la terminal que permite ver la salida página por página. Útil cuando la lista de resultados es muy larga.
 
-Docker build -t [nombre:tag] . -> Construye una imagen a partir de un Dockerfile.
+docker build -t [nombre:tag] . -> Construye una imagen a partir de un Dockerfile.
     -t [nombre:tag]: Asigna un nombre y una versión (tag) a la imagen (ej. `mi-app:v1`). 
                      Si omites el tag (ej. `docker build -t mi-app .`), Docker usará `latest` por defecto.
     . (punto final): Especifica el "contexto de construcción". Es la ruta a un directorio en tu máquina local que contiene el Dockerfile y los archivos necesarios para construir la imagen. El daemon de Docker recibe este contexto para ejecutar la construcción (El punto final indica que se busque el Dockerfile en la ruta actual).
 
-Docker run [opciones] [IMAGEN] [COMANDO] -> Crea un nuevo contenedor a partir de una imagen y lo inicia. Si se especifica un [COMANDO], este sobreescribe el `CMD` por defecto de la imagen.
+docker run [opciones] [IMAGEN] [COMANDO] -> Crea un nuevo contenedor a partir de una imagen y lo inicia. Si se especifica un [COMANDO], este sobreescribe el `CMD` por defecto de la imagen.
     -d: Ejecuta el contenedor en segundo plano (modo "detached") e imprime el ID del contenedor.
     -p [puerto_host]:[puerto_contenedor]: Mapea un puerto de tu máquina a un puerto del contenedor.
     --name [nombre]: Asigna un nombre específico al contenedor. Si no se especifica, Docker generará uno aleatorio.
     -v [volumen_host]:[volumen_contenedor]: Monta un volumen del host en el contenedor para persistencia de datos.
     --rm: Elimina automáticamente el contenedor cuando se detiene. Útil para contenedores efímeros que no necesitan persistir después de su ejecución.
-Docker rename [ID/Nombre actual] [Nuevo nombre] -> Cambia el nombre de un contenedor existente.
+docker rename [ID/Nombre actual] [Nuevo nombre] -> Cambia el nombre de un contenedor existente.
 
-Docker image ls         -> Lista las imágenes Docker disponibles en tu máquina.
+docker image ls         -> Lista las imágenes Docker disponibles en tu máquina.
     --all o -a: Muestra todas las imágenes, incluyendo las intermedias que no tienen etiquetas.
     --filter [filtro]: Permite filtrar las imágenes por nombre, etiqueta, etc. (ej. `docker image ls / docker images --filter=reference='mi-app*'`).
     --format [formato]: Personaliza la salida de la lista de imágenes usando un formato específico (ej. `docker image ls / docker images --format "{{.Repository}}:{{.Tag}}"`).
 
-Docker ps               -> Lista los contenedores que están en ejecución.
+docker ps               -> Lista los contenedores que están en ejecución.
     --all o -a: Lista todos los contenedores (en ejecución y detenidos).
     --no-trunc: Muestra los IDs completos de los contenedores en lugar de truncarlos.
-Docker container ls    -> Lista los contenedores que están en ejecución.
+docker container ls    -> Lista los contenedores que están en ejecución.
 
-Docker stop [ID/Nombre del contenedor] -> Detiene un contenedor en ejecución.
-Docker start [ID/Nombre del contenedor]-> Inicia un contenedor que fue detenido.
-Docker restart [ID/Nombre del contenedor] -> Reinicia un contenedor en ejecución.
+docker stop [ID/Nombre del contenedor] -> Detiene un contenedor en ejecución.
+docker start [ID/Nombre del contenedor]-> Inicia un contenedor que fue detenido.
+docker restart [ID/Nombre del contenedor] -> Reinicia un contenedor en ejecución.
 
-Docker rm [ID/Nombre del contenedor]   -> Elimina uno o más contenedores DETENIDOS.
+docker rm [ID/Nombre del contenedor]   -> Elimina uno o más contenedores DETENIDOS.
     -f: Fuerza la eliminación de un contenedor en ejecución.
-Docker rmi [ID/Nombre de la imagen]    -> Elimina una o más imágenes. Una imagen no puede ser eliminada si un contenedor (incluso detenido) la está usando.
+docker rmi [ID/Nombre de la imagen]    -> Elimina una o más imágenes. Una imagen no puede ser eliminada si un contenedor (incluso detenido) la está usando.
 
-Docker exec -it [ID/Nombre] [comando] -> Ejecuta un comando dentro de un contenedor en ejecución. Muy útil para depurar (ej. `docker exec -it mi-contenedor bash`).
+docker exec -it [ID/Nombre] [comando] -> Ejecuta un comando dentro de un contenedor en ejecución. Muy útil para depurar (ej. `docker exec -it mi-contenedor bash`).
     -i: Mantiene la sesión interactiva abierta.
     -t: Asigna una terminal TTY para que puedas interactuar con el contenedor
-Docker logs [ID/Nombre] -> Muestra la salida (logs) de un contenedor.
+docker logs [ID/Nombre] -> Muestra la salida (logs) de un contenedor.
     -f: Sigue la salida de los logs en tiempo real.
 
-Docker stats [ID/Nombre] -> Muestra en tiempo real el consumo de recursos (CPU, Memoria, Red, I/O) de los contenedores. Si no se especifica nombre, muestra todos los activos.
+docker stats [ID/Nombre] -> Muestra en tiempo real el consumo de recursos (CPU, Memoria, Red, I/O) de los contenedores. Si no se especifica nombre, muestra todos los activos.
 
-Docker system prune -> Elimina todos los contenedores detenidos, redes no utilizadas, imágenes "dangling" (sin etiqueta) y la caché de construcción.
+docker system prune -> Elimina todos los contenedores detenidos, redes no utilizadas, imágenes "dangling" (sin etiqueta) y la caché de construcción.
     -a: Elimina también todas las imágenes no utilizadas (no solo las dangling).
 
-Docker cp [fuente] [destino] -> Copia archivos o directorios entre el host y un contenedor, o entre dos contenedores. 
+docker cp [fuente] [destino] -> Copia archivos o directorios entre el host y un contenedor, o entre dos contenedores. 
 
-Docker commit [ID/Nombre del contenedor] [nombre_imagen:tag] -> Crea una nueva imagen a partir de un contenedor existente, incluyendo todos los cambios realizados en el contenedor.
+docker commit [ID/Nombre del contenedor] [nombre_imagen:tag] -> Crea una nueva imagen a partir de un contenedor existente, incluyendo todos los cambios realizados en el contenedor.
+
+docker info -> Muestra información detallada sobre la instalación de Docker, incluyendo el número de contenedores, imágenes, versiones, configuración del sistema, etc.
 
 **** Volumenes ****
-Docker volume create [nombre_volumen] -> Crea un nuevo volumen con el nombre especificado.
+docker volume create [nombre_volumen] -> Crea un nuevo volumen con el nombre especificado.
 
-Docker volume ls -> Lista todos los volúmenes disponibles en tu sistema.
+docker volume ls -> Lista todos los volúmenes disponibles en tu sistema.
     -q: Muestra solo los nombres de los volúmenes, sin detalles adicionales.
     -s: Muestra el tamaño de cada volumen en la lista.
 
-Docker volume inspect [nombre_volumen] -> Muestra detalles sobre un volumen específico, como su ubicación en el host y los contenedores que lo están utilizando.
+docker volume inspect [nombre_volumen] -> Muestra detalles sobre un volumen específico, como su ubicación en el host y los contenedores que lo están utilizando.
     -f: Muestra solo la información específica que deseas
 
-Docker volume rm [nombre_volumen] -> Elimina un volumen específico. Ten en cuenta que solo puedes eliminar un volumen si no está siendo utilizado por ningún contenedor.
+docker volume rm [nombre_volumen] -> Elimina un volumen específico. Ten en cuenta que solo puedes eliminar un volumen si no está siendo utilizado por ningún contenedor.
     -f: Fuerza la eliminación del volumen incluso si está siendo utilizado por un contenedor (no recomendado, ya que puede causar problemas de datos).
 
-Docker volume prune -> Elimina todos los volúmenes que no están siendo utilizados por ningún contenedor. Este comando es útil para limpiar volúmenes no utilizados y liberar espacio en tu sistema.
+docker volume prune -> Elimina todos los volúmenes que no están siendo utilizados por ningún contenedor. Este comando es útil para limpiar volúmenes no utilizados y liberar espacio en tu sistema.
 
 **** Comandos de limitacion de recursos en contenedores ****
 
