@@ -152,6 +152,12 @@ Existen 3 tipos de volumenes:
     Este es como la parte media de los otros 2, donde tenemos acceso al volumen, pero docker aun se encarga de la gestion.
 
 Si usas la instruccion VOLUME en un Dockerfile, aun puedes montar un volumen con nombre o un bind mount al ejecutar el contenedor, lo que te da flexibilidad para elegir la mejor opción de almacenamiento según tus necesidades específicas.
+Tambien se puede montar varios volumenes diferentes y de distintos tipos (bind mounts, volúmenes nombrados, etc.) al mismo tiempo, lo que permite una gran flexibilidad en la gestión de datos persistentes.
+
+****Dangling volumes****
+Son volúmenes que ya no están asociados a ningún contenedor.
+Esto puede ocurrir cuando un contenedor que usaba un volumen es eliminado, pero el volumen no se elimina automáticamente, lo que puede llevar a la acumulación de volúmenes no utilizados que ocupan espacio en el sistema.
+Para eliminar los volúmenes dangling, puedes usar el comando `docker volume prune`, que eliminará todos los volúmenes que no están siendo utilizados por ningún contenedor, ayudando a liberar espacio en tu sistema.
 
 ///////////////// Dockerfile Instructions //////////////////
 

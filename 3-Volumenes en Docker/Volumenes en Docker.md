@@ -222,3 +222,7 @@ Para eliminar este volumen, debemos asegurarnos de que ningún contenedor lo est
 docker volume rm mysql-test-volumen
 ```
 Si el volumen está en uso, Docker mostrará un error impidiendo su eliminación.
+
+---
+
+**NOTA:** Un contenedor puede usar varios volumenes diferentes y de distintos tipos (bind mounts, volúmenes nombrados, etc.) al mismo tiempo, lo que permite una gran flexibilidad en la gestión de datos persistentes.
