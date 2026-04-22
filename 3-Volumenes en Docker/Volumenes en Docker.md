@@ -225,4 +225,66 @@ Si el volumen está en uso, Docker mostrará un error impidiendo su eliminación
 
 ---
 
-**NOTA:** Un contenedor puede usar varios volumenes diferentes y de distintos tipos (bind mounts, volúmenes nombrados, etc.) al mismo tiempo, lo que permite una gran flexibilidad en la gestión de datos persistentes.
+---
+
+## 4. Compartir volúmenes entre contenedores
+
+A continuación, veremos de manera sencilla cómo dos contenedores pueden utilizar el mismo volumen simultáneamente.
+
+Empezaremos por crear un volumen:
+
+```bash
+docker volume create volumen-test
+```
+
+Después, crearemos dos contenedores de Ubuntu que utilizarán este mismo volumen:
+
+```bash
+docker run -dti -v volumen-test:/opt --name compartir-volumen1 ubuntu
+docker run -dti -v volumen-test:/opt --name compartir-volumen2 ubuntu
+```
+
+Una vez creados los contenedores, accederemos a ellos utilizando dos terminales diferentes (una para cada contenedor):
+
+```bash
+docker exec -it compartir-volumen1 bash
+```
+---
+```bash
+docker exec -it compartir-volumen2 bash
+```
+
+Ahora, en cualquiera de las dos terminales de los contenedores a los que ingresamos, realizaremos una prueba. Para esto, crearemos un archivo en el directorio montado:
+
+**Terminal 1:**
+```bash
+root@e2173848710a:/# echo "Ejemplo de compartir volumen" > /opt/Ejemplo.txt
+```
+
+En la consola del segundo contenedor, verificaremos que el archivo se creó correctamente con el contenido generado en la Terminal 1:
+
+**Terminal 2:**
+```bash
+root@fa51771c39c9:/# cat /opt/Ejemplo.txt
+```
+**Output:** `Ejemplo de compartir volumen`
+
+Con esta prueba, comprobamos cómo ambos contenedores están compartiendo y utilizando el mismo volumen de datos de forma efectiva.
+
+---
+
+## 📌 Conclusiones y Tips
+
+- **Flexibilidad de montaje**: Un solo contenedor puede utilizar múltiples volúmenes de distintos tipos (bind mounts, volúmenes nombrados, etc.) de forma simultánea, permitiendo separar, por ejemplo, los datos de la aplicación de los archivos de logs.
+
+- **Compartición y Riesgos**: Es posible que varios contenedores utilicen el mismo volumen simultáneamente. Si bien es una herramienta poderosa para compartir información entre servicios, se debe tener precaución (especialmente con bases de datos) para evitar problemas de concurrencia o corrupción de datos si intentan escribir al mismo tiempo sin la gestión adecuada.
+
+- **Persistencia de configuración**: Al reutilizar un volumen (ya sea bind mount o nombrado) en un nuevo contenedor de base de datos, las variables de entorno iniciales (como contraseñas o nombres de DB) dejan de ser estrictamente necesarias, ya que el estado y la configuración ya existen dentro del volumen persistido.
+
+- **Compatibilidad en WSL2**: Al trabajar con *Bind Mounts* en entornos Windows con WSL2, es recomendable evitar rutas montadas sobre `/mnt/*` para servicios exigentes como MySQL, ya que pueden presentar errores de permisos o rendimiento. Es mejor utilizar la estructura de archivos nativa de la distribución de Linux.
+
+- **Administración nativa**: Los volúmenes nombrados son más fáciles de administrar y rastrear que los anónimos, ya que Docker los gestiona internamente y permite identificarlos rápidamente mediante el comando `docker volume ls`.
+
+- **Higiene del sistema**: Es una buena práctica realizar limpiezas periódicas de volúmenes "huérfanos" (dangling) que ya no están asociados a ningún contenedor para liberar espacio en disco.
+
+---

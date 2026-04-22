@@ -8,6 +8,7 @@ Bienvenido a mi repositorio de notas y prácticas del curso de Docker. Aquí ir�
 
 - [Módulo 1: Entendiendo las imágenes](#módulo-1-entendiendo-las-imágenes)
 - [Módulo 2: Trabajando con contenedores](#módulo-2-trabajando-con-contenedores)
+- [Módulo 3: Volúmenes en Docker](#módulo-3-volúmenes-en-docker)
 
 ---
 
@@ -238,6 +239,61 @@ Aprendí a restringir el uso de hardware de los contenedores para asegurar la es
 - **Documentación en Docker Hub**: Es vital revisar la sección "How to use this image" de cada imagen oficial, ya que ahí se especifican las variables de entorno necesarias (como en MySQL) y los puertos por defecto.
 - **Persistencia**: Aunque en estas prácticas los datos son efímeros, en entornos reales debemos usar **Volúmenes** para que la información de las bases de datos no se pierda al eliminar el contenedor.
 - **Interactividad**: El flag `-it` en `docker exec` es nuestra puerta de entrada para depurar y administrar servicios "desde adentro".
+
+---
+
+## Módulo 3: Volúmenes en Docker
+
+En este módulo se profundizó en la persistencia de datos, aprendiendo a gestionar la información para que trascienda el ciclo de vida de los contenedores y evitar la pérdida de datos críticos.
+
+### 📄 Recursos
+El desarrollo detallado de los pasos seguidos, comandos ejecutados y resultados de estas prácticas se especifica en:
+- **[Volúmenes en Docker.md](./3-Volumenes%20en%20Docker/Volumenes%20en%20Docker.md)**
+  - *Ruta:* `3-Volumenes en Docker\Volumenes en Docker.md`
+
+---
+
+### 🚀 Práctica: El Riesgo de los Volúmenes Anónimos
+Se realizó una prueba con MySQL donde se comprobó que, al no especificar un volumen, Docker crea uno anónimo de forma automática. 
+**Resultado:** Al eliminar el contenedor, el volumen anónimo también desaparece, provocando la pérdida total de la base de datos creada.
+
+---
+
+### 🚀 Práctica: Persistencia con Bind Mounts (Volumen de Host)
+Se utilizó un directorio específico del host para mapearlo directamente al contenedor de MySQL.
+
+**Puntos clave:**
+- Se vinculó una ruta local (`~/docker-volumes/mysql`) con `/var/lib/mysql` dentro del contenedor.
+- Se verificó que, incluso borrando el contenedor, los archivos de la base de datos permanecen en el host y pueden ser reutilizados por nuevos contenedores.
+
+---
+
+### 🚀 Práctica: Volúmenes Nombrados (Named Volumes)
+Se implementó la gestión nativa de Docker para la persistencia, creando volúmenes que Docker administra internamente.
+
+**Comandos clave:**
+- `docker volume create mysql-test-volumen`
+- Administración: `docker volume ls` y `docker volume inspect`.
+- **Ventaja:** Mayor portabilidad y facilidad de administración que los Bind Mounts.
+
+---
+
+### 🚀 Práctica: Compartir Datos entre Contenedores
+Se demostró la capacidad de Docker para que múltiples contenedores accedan a la misma fuente de datos.
+
+**Pasos realizados:**
+1. Se creó un volumen común llamado `volumen-test`.
+2. Se iniciaron dos contenedores de Ubuntu montando dicho volumen en `/opt`.
+3. Se comprobó que un archivo creado en el **Contenedor 1** era inmediatamente visible y editable por el **Contenedor 2**, facilitando la colaboración entre servicios.
+
+---
+
+### 💡 Lecciones Aprendidas y Tips
+
+- **Persistencia Crítica**: Los volúmenes son obligatorios para aplicaciones con estado (bases de datos, logs, uploads).
+- **Diferenciación**: Los *Bind Mounts* son ideales para desarrollo (mapeo de código), mientras que los *Named Volumes* son preferibles en entornos de producción.
+- **Higiene del Sistema**: Aprendí a usar `docker volume prune` para eliminar volúmenes "huérfanos" (dangling) que ya no están asociados a ningún contenedor y solo consumen espacio.
+- **Flexibilidad**: Un contenedor puede usar múltiples volúmenes de distintos tipos simultáneamente, permitiendo separar, por ejemplo, los datos de la base de datos de los logs.
 
 ---
 
