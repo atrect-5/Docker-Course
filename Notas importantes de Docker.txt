@@ -101,16 +101,6 @@ Si no se asigna un nombre, Docker generará uno aleatorio para el contenedor, lo
 Esto facilita la gestión de los contenedores, ya que puedes referirte a ellos por nombre en lugar de usar el ID del contenedor, que es más difícil de recordar y manejar.
 Si necesitas cambiar el nombre de un contenedor después de haberlo creado, puedes usar el comando `docker rename` (ej. `docker rename mi-contenedor nuevo-nombre`).
 
-****Volumenes****
-Los volúmenes en Docker son una forma de persistir datos generados y utilizados por los contenedores.
-Un volumen es un directorio en el sistema de archivos del host que se monta dentro del contenedor, lo que permite que los datos persistan incluso después de que el contenedor se detenga o elimine.
-Los volúmenes son útiles para almacenar datos que deben sobrevivir al ciclo de vida de un contenedor, como bases de datos, archivos de configuración o cualquier otro tipo de datos que la aplicación necesite conservar.
-Para crear un volumen, puedes usar el comando `docker volume create` (ej. `docker volume create mi-volumen`).
-Una vez creado el volumen, puedes montarlo en un contenedor usando la opción `-v` al ejecutar `docker run` (ej. `docker run -v mi-volumen:/data mi-imagen`), lo que montará el volumen `mi-volumen` en el directorio `/data` dentro del contenedor.
-
-NOTA: La instrucción `VOLUME` en el `Dockerfile` crea un "punto de montaje" que genera un volumen anónimo automáticamente si el usuario no especifica uno al correr el contenedor; es útil para asegurar que los datos no se pierdan por descuido. 
-Por el contrario, usar la CLI (`docker run -v` o `docker volume create`) permite crear **volúmenes con nombre** o **bind mounts** (mapeo directo a carpetas del host), lo cual es mejor para tener control sobre dónde residen los datos físicamente y para compartirlos fácilmente entre diferentes contenedores.
-
 ****Sobreescribir el CMD de una imagen sin un Dockerfile****
 El CMD de un Dockerfile se puede sobreescribir al ejecutar un contenedor a partir de una imagen, sin necesidad de modificar el Dockerfile.
 Para esto, se debe ejecutar el comando "docker run" (Checar comandos importantes de Docker CLI) y especificar el nuevo comando al final del comando de ejecución (ej. `docker run mi-imagen echo "Hola Mundo"`).
@@ -138,6 +128,30 @@ Hay ocaciones en las que una vez que se ha creado un contenedor, se le han hecho
 Para esto, se debe ejecutar el comando "docker commit" (Checar comandos importantes de Docker CLI).
 Este comando crea una nueva imagen a partir de un contenedor existente, incluyendo todos los cambios realizados en el contenedor.
 Ejemplo: `docker commit mi-contenedor mi-nueva-imagen:tag`
+
+//// Volumenes en Docker ////
+Los volúmenes en Docker son una forma de persistir datos generados y utilizados por los contenedores.
+Un volumen es un directorio en el sistema de archivos del host que se monta dentro del contenedor, lo que permite que los datos persistan incluso después de que el contenedor se detenga o elimine.
+Los volúmenes son útiles para almacenar datos que deben sobrevivir al ciclo de vida de un contenedor, como bases de datos, archivos de configuración o cualquier otro tipo de datos que la aplicación necesite conservar.
+
+Existen 3 tipos de volumenes:
+- Volúmenes anónimos
+    -> Se crean automáticamente cuando se usa la instrucción `VOLUME` en un Dockerfile sin especificar un nombre. 
+    Estos volúmenes no tienen un nombre asignado y se gestionan automáticamente por Docker.
+    Una vez creado el contenedor, Docker asigna un volumen anónimo a la ruta especificada en el Dockerfile (ej. `VOLUME ["/data"]`), lo que garantiza que los datos almacenados en esa ruta persistan incluso si el contenedor se elimina.
+    Este tipo de volumenes no permite compartir datos entre contenedores, ya que cada contenedor tendrá su propio volumen anónimo, pero es útil para garantizar la persistencia de datos sin necesidad de gestionar manualmente los volúmenes.
+- Bind mounts
+    -> Permiten montar un directorio específico del host en el contenedor. 
+    Se especifica la ruta completa del directorio del host al usar la opción `-v` (ej. `docker run -v /ruta/host:/data mi-imagen`), lo que montará el directorio `/ruta/host` del host en el directorio `/data` dentro del contenedor.
+    Esto es útil para desarrollo, ya que permite que los cambios realizados en el host se reflejen inmediatamente en el contenedor.
+    Este tipo de volumen requiere cuidado para evitar problemas de seguridad o de permisos, ya que el contenedor tiene acceso directo a los archivos del host.
+- Volúmenes con nombre
+    -> Son gestionados por Docker y se crean usando el comando `docker volume create`. 
+    Se montan en el contenedor usando la opción `-v` al ejecutar `docker run` (ej. `docker run -v mi-volumen:/data mi-imagen`), lo que montará el volumen `mi-volumen` en el directorio `/data` dentro del contenedor.
+    Estos volúmenes son útiles para compartir datos entre contenedores o para mantener datos persistentes sin preocuparse por la ubicación física en el host, ya que Docker se encarga de gestionarlos.
+    Este es como la parte media de los otros 2, donde tenemos acceso al volumen, pero docker aun se encarga de la gestion.
+
+Si usas la instruccion VOLUME en un Dockerfile, aun puedes montar un volumen con nombre o un bind mount al ejecutar el contenedor, lo que te da flexibilidad para elegir la mejor opción de almacenamiento según tus necesidades específicas.
 
 ///////////////// Dockerfile Instructions //////////////////
 
@@ -208,6 +222,9 @@ docker logs [ID/Nombre] -> Muestra la salida (logs) de un contenedor.
 
 docker stats [ID/Nombre] -> Muestra en tiempo real el consumo de recursos (CPU, Memoria, Red, I/O) de los contenedores. Si no se especifica nombre, muestra todos los activos.
 
+docker inspect [ID/Nombre del contenedor] -> Muestra detalles sobre un contenedor específico, incluyendo información sobre los volúmenes montados, redes, configuración, etc.
+    -f: Permite formatear la salida para mostrar solo la información específica que deseas.
+
 docker system prune -> Elimina todos los contenedores detenidos, redes no utilizadas, imágenes "dangling" (sin etiqueta) y la caché de construcción.
     -a: Elimina también todas las imágenes no utilizadas (no solo las dangling).
 
@@ -222,7 +239,6 @@ docker volume create [nombre_volumen] -> Crea un nuevo volumen con el nombre esp
 
 docker volume ls -> Lista todos los volúmenes disponibles en tu sistema.
     -q: Muestra solo los nombres de los volúmenes, sin detalles adicionales.
-    -s: Muestra el tamaño de cada volumen en la lista.
 
 docker volume inspect [nombre_volumen] -> Muestra detalles sobre un volumen específico, como su ubicación en el host y los contenedores que lo están utilizando.
     -f: Muestra solo la información específica que deseas
@@ -231,6 +247,8 @@ docker volume rm [nombre_volumen] -> Elimina un volumen específico. Ten en cuen
     -f: Fuerza la eliminación del volumen incluso si está siendo utilizado por un contenedor (no recomendado, ya que puede causar problemas de datos).
 
 docker volume prune -> Elimina todos los volúmenes que no están siendo utilizados por ningún contenedor. Este comando es útil para limpiar volúmenes no utilizados y liberar espacio en tu sistema.
+    -a: Elimina todos los volumenes sin usar, no solo los anonimos.
+    -f: Fuerza la eliminación sin pedir confirmación.
 
 **** Comandos de limitacion de recursos en contenedores ****
 
