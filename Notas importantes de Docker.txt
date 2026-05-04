@@ -159,6 +159,30 @@ Son volúmenes que ya no están asociados a ningún contenedor.
 Esto puede ocurrir cuando un contenedor que usaba un volumen es eliminado, pero el volumen no se elimina automáticamente, lo que puede llevar a la acumulación de volúmenes no utilizados que ocupan espacio en el sistema.
 Para eliminar los volúmenes dangling, puedes usar el comando `docker volume prune`, que eliminará todos los volúmenes que no están siendo utilizados por ningún contenedor, ayudando a liberar espacio en tu sistema.
 
+//// Redes en Docker ////
+Las redes en Docker son un componente esencial que define cómo se comunican los contenedores entre sí y con el mundo exterior, utilizando diferentes controladores para gestionar el aislamiento y la conectividad. 
+
+Hay diferentes tipos de redes en Docker, como bridge, host y overlay, cada una con sus propias características y casos de uso específicos.
+- None 
+    -> Es una red que no tiene conectividad, lo que significa que los contenedores conectados a esta red no pueden comunicarse entre sí ni con el host. Es útil para aplicaciones que no necesitan comunicación de red o para aislar completamente un contenedor.
+- Bridge
+    -> Es la red predeterminada que Docker crea para los contenedores. Permite la comunicación entre contenedores en la misma red, pero no entre contenedores en diferentes redes. Es útil para aplicaciones que necesitan comunicarse entre sí dentro del mismo host.
+- Host
+    -> Permite que los contenedores compartan la red del host, lo que significa que los contenedores pueden acceder a los puertos del host directamente. Es útil para aplicaciones que necesitan un alto rendimiento de red o que requieren acceso a servicios en el host, pero no permite ejecutar múltiples contenedores del mismo servicio simultáneamente.
+- Overlay
+    -> Permite la comunicación entre contenedores en diferentes hosts, lo que es útil para aplicaciones distribuidas o microservicios que se ejecutan en un clúster de Docker Swarm o Kubernetes.
+- Macvlan
+    -> Permite asignar una dirección MAC a un contenedor, lo que le permite aparecer como un dispositivo físico en la red. Es útil para aplicaciones que requieren una integración más profunda con la red, como dispositivos IoT o aplicaciones que necesitan acceso a servicios de red específicos.
+
+Docker crea automáticamente una red bridge por defecto para los contenedores, lo que permite que los contenedores se comuniquen entre sí dentro de esa red.
+Docker también permite crear redes personalizadas para organizar y aislar los contenedores según las necesidades de la aplicación, lo que facilita la gestión de la comunicación entre contenedores y mejora la seguridad al limitar el acceso a ciertos contenedores dentro de una red específica.
+
+Las redes None, Host y Bridge vienen predefinidas con Docker, mientras que las demas pueden ser creadas por el usuario según las necesidades de la aplicación.
+
+Para una gestión eficiente y segura, se recomienda crear redes bridge definidas por el usuario, ya que ofrecen resolución DNS automática entre contenedores y mejor aislamiento que la red bridge por defecto.
+
+Un contenedor puede estar conectado a multiples redes a la vez.
+
 ///////////////// Dockerfile Instructions //////////////////
 
 FROM    -> Define la imagen base (ej. `ubuntu:22.04`) a partir de la cual se construirá la nueva imagen. Es la primera instrucción obligatoria en un Dockerfile.
@@ -200,6 +224,8 @@ docker run [opciones] [IMAGEN] [COMANDO] -> Crea un nuevo contenedor a partir de
     --name [nombre]: Asigna un nombre específico al contenedor. Si no se especifica, Docker generará uno aleatorio.
     -v [volumen_host]:[volumen_contenedor]: Monta un volumen del host en el contenedor para persistencia de datos.
     --rm: Elimina automáticamente el contenedor cuando se detiene. Útil para contenedores efímeros que no necesitan persistir después de su ejecución.
+    --network [network]: Permite conectar el contenedor a una red (bridge por defecto si no se especifica).
+        --ip [IP]: Asigna una dirección IP específica al contenedor dentro de la red personalizada (solo funciona si se conecta a una red personalizada con un rango de IP definido).
 docker rename [ID/Nombre actual] [Nuevo nombre] -> Cambia el nombre de un contenedor existente.
 
 docker image ls         -> Lista las imágenes Docker disponibles en tu máquina.
@@ -255,6 +281,22 @@ docker volume rm [nombre_volumen] -> Elimina un volumen específico. Ten en cuen
 docker volume prune -> Elimina todos los volúmenes que no están siendo utilizados por ningún contenedor. Este comando es útil para limpiar volúmenes no utilizados y liberar espacio en tu sistema.
     -a: Elimina todos los volumenes sin usar, no solo los anonimos.
     -f: Fuerza la eliminación sin pedir confirmación.
+
+**** Comandos de redes en Docker ****
+
+docker network create [nombre_red] -> Crea una nueva red con el nombre especificado.
+    -d [driver]: Especifica el controlador de red a usar (ej. `bridge`, `overlay`, `macvlan`). Si no se especifica, se usará `bridge` por defecto.
+
+docker network connect [nombre_red] [ID/Nombre del contenedor] -> Conecta un contenedor a una red específica, permitiendo que el contenedor se comunique con otros contenedores en esa red.
+docker network disconnect [nombre_red] [ID/Nombre del contenedor] -> Desconecta un contenedor de una red específica, lo que impide que el contenedor se comunique con otros contenedores en esa red.
+
+docker network inspect [nombre_red] -> Muestra detalles sobre una red específica, incluyendo los contenedores conectados, la configuración de IP, el controlador de red, etc.
+    -f: Muestra solo la información específica que deseas.
+
+docker network ls -> Lista todas las redes disponibles en tu sistema.
+
+dicker network rm [nombre_red] -> Elimina una red específica. Ten en cuenta que solo puedes eliminar una red si no hay contenedores conectados a ella.
+docker network prune -> Elimina todas las redes que no están siendo utilizadas.
 
 **** Comandos de limitacion de recursos en contenedores ****
 

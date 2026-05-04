@@ -9,6 +9,7 @@ Bienvenido a mi repositorio de notas y prácticas del curso de Docker. Aquí ir�
 - [Módulo 1: Entendiendo las imágenes](#módulo-1-entendiendo-las-imágenes)
 - [Módulo 2: Trabajando con contenedores](#módulo-2-trabajando-con-contenedores)
 - [Módulo 3: Volúmenes en Docker](#módulo-3-volúmenes-en-docker)
+- [Módulo 4: Redes en Docker](#módulo-4-redes-en-docker)
 
 ---
 
@@ -294,6 +295,42 @@ Se demostró la capacidad de Docker para que múltiples contenedores accedan a l
 - **Diferenciación**: Los *Bind Mounts* son ideales para desarrollo (mapeo de código), mientras que los *Named Volumes* son preferibles en entornos de producción.
 - **Higiene del Sistema**: Aprendí a usar `docker volume prune` para eliminar volúmenes "huérfanos" (dangling) que ya no están asociados a ningún contenedor y solo consumen espacio.
 - **Flexibilidad**: Un contenedor puede usar múltiples volúmenes de distintos tipos simultáneamente, permitiendo separar, por ejemplo, los datos de la base de datos de los logs.
+
+---
+
+## Módulo 4: Redes en Docker
+
+En este módulo exploré cómo Docker gestiona la comunicación entre contenedores y el aislamiento de red, aprendiendo a crear redes personalizadas y a configurar la conectividad de forma precisa.
+
+### 📄 Recursos
+El desarrollo detallado de los pasos seguidos, comandos ejecutados y resultados de estas prácticas se especifica en:
+- **[Redes en docker.md](./4-Redes%20en%20Docker/Redes%20en%20docker.md)**
+
+---
+
+### 🚀 Práctica: Redes Personalizadas y DNS
+Se crearon redes con el driver `bridge` definiendo subredes y gateways específicos. Se comprobó que, a diferencia de la red bridge por defecto, las redes creadas por el usuario permiten la resolución DNS automática, permitiendo que los contenedores se comuniquen por su nombre en lugar de su IP.
+
+### 🚀 Práctica: Conectividad y Aislamiento
+Se realizaron pruebas de "ping" entre múltiples contenedores para validar:
+- La comunicación fluida dentro de una misma red personalizada.
+- El aislamiento total entre contenedores que pertenecen a redes distintas.
+- La capacidad de conectar un contenedor a varias redes simultáneamente para actuar como puente.
+
+### 🚀 Práctica: Redes Especiales (None y Host)
+Se experimentó con los modos de red avanzados:
+- **None**: Aislamiento total del contenedor sin interfaces de red externas.
+- **Host**: Eliminación del aislamiento de red para que el contenedor comparta directamente la IP y puertos de la máquina host.
+
+---
+
+### 💡 Lecciones Aprendidas y Tips
+
+- **DNS Interno**: Siempre es preferible crear redes personalizadas, ya que la red `bridge` por defecto no resuelve nombres de contenedores.
+- **Aislamiento por Diseño**: Docker garantiza que los contenedores en redes diferentes no puedan verse entre sí, lo cual es fundamental para la seguridad en microservicios.
+- **Orden de Conexión**: Si un contenedor se crea y luego se conecta a una red, mantendrá la conexión a la red original (normalmente bridge) y a la nueva, teniendo múltiples IPs.
+- **Control de IPs**: El uso del flag `--ip` permite asignar direcciones estáticas dentro de nuestras subredes, algo vital para servicios que requieren configuraciones fijas.
+- **Higiene de Redes**: Al igual que con los volúmenes, es buena práctica usar `docker network prune` para eliminar redes que ya no se utilizan y evitar conflictos de subredes en el futuro.
 
 ---
 
