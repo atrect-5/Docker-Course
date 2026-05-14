@@ -1,0 +1,35 @@
+services:
+  db:
+    image: mysql
+    container_name: my-db-vol
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: admin
+      MYSQL_DATABASE: docker-compose-db
+      MYSQL_USER: docker-user
+      MYSQL_PASSWORD: docker-password
+
+
+    # La instruccion `volumes` dentro del servicio se usa para asignarle un volumen a ese mismo servicio.
+    # En este caso le estamos asignando el volumen `mysql_data_volume` (creado mas adelante en este mismo archivo) al servicio `db`.
+    # Esto guardara lo que hay en el directorio `/var/lib/mysql` del contenedor en el volumen asignado.
+    volumes:
+      - mysql_data_volume:/var/lib/mysql
+
+      # Si en lugar de solo colocar el nombre del volumen, colocas una ruta:
+    #volumes:
+      #- $PWD/data:/var/lib/mysql
+      # Esto utilizara un bind mount en lugar de un volumen nombrado.
+
+# La instruccion `volumes` a la misma altura de services se usa para crear un volumen nombrado.
+# En este caso se esta creando un volumen llamado `mysql_data_volume` que sera gestionado por Docker, pero que podemos acceder facilmente a el por su nombre.
+volumes:
+  mysql_data_volume:
+
+  # Cuando se crean volumenes de esta manera, docker compose siempre les agregara antes el nombre de la carpeta donde estes, a menos que realices lo siguiente:
+#volumes:
+  #mysql_data_volume:
+    #name: mysql_data_volume
+  # En este caso, siempre se llamara de la misma manera.
+

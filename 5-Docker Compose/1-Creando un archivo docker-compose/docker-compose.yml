@@ -1,0 +1,51 @@
+# Docker Compose es una herramienta que permite definir y ejecutar aplicaciones multi-contenedor de Docker. 
+# Con Docker Compose, puedes usar un archivo YAML para configurar los servicios de tu aplicación, y luego con un solo comando, puedes crear e iniciar todos los servicios desde esa configuración.
+
+# Nota: La instrucción `version` ya no es necesaria en las versiones modernas de Docker. 
+# Se refería a la versión del formato del archivo (schema), no a la versión de la aplicación (que puede parecer asi).
+#version: "3.8"
+# (Se ha comentado por recomendaciones de Docker Compose)
+
+# La sección `services` (Obligatoria) define los servicios que componen la aplicación. 
+# Cada servicio se ejecutará en un contenedor separado y puede tener su propia configuración, como la imagen a usar, los puertos a exponer, las variables de entorno, etc.
+# Debe contener al menos un servicio para que el archivo de configuración sea válido.
+services:
+
+# En este ejemplo, se define un servicio llamado `web`.
+  web:
+    # La instrucción `image` especifica la imagen Docker que se usará para crear el contenedor del servicio. 
+    # En este caso, se está utilizando la imagen oficial de Nginx disponible en Docker Hub. Esto significa que cuando se inicie el servicio `web`, Docker Compose descargará la imagen de Nginx (si no está ya presente en el host) y la usará para crear el contenedor.
+    image: nginx
+
+    # La instrucción `container_name` permite asignar un nombre específico al contenedor creado para este servicio.
+    # En este caso, se está asignando el nombre "my-site" al contenedor que se creará para el servicio `web`. 
+    # Esto facilita la identificación y gestión del contenedor, especialmente cuando se tienen múltiples servicios. En lugar de referenciar el contenedor por su ID generado automáticamente, puedes usar el nombre "my-site" para interactuar con él.
+    container_name: my-site
+    
+    # La instrucción `ports` define los puertos que se deben mapear entre el host y el contenedor para este servicio.
+    # En este caso, se está mapeando el puerto 8080 del host al puerto 80 del contenedor. Esto significa que cualquier solicitud que llegue al puerto 8080 del host será redirigida al puerto 80 del contenedor, donde Nginx está escuchando por defecto.
+    ports:
+      - "8080:80"
+
+# Se define otro servicio llamado `db`.
+  db:
+    # Utiliza la imagen oficial de MySQL disponible en Docker Hub para crear el contenedor del servicio `db`.
+    image: mysql
+
+    # Asigna el nombre "my-db" al contenedor del servicio `db`.
+    container_name: my-db
+    
+    # Mapea el puerto 3306 del host al puerto 3306 del contenedor, lo que permite acceder a la base de datos MySQL desde el host a través de ese puerto.
+    ports:
+      - "3306:3306"
+
+    # La instrucción `environment` se utiliza para definir variables de entorno que se pasarán al contenedor cuando se inicie el servicio.
+    # En este caso, se está definiendo una serie de variables de entorno necesarias para configurar MySQL:
+    environment:
+      # Define la variable de entorno `MYSQL_ROOT_PASSWORD` con el valor "my-secret-pw". 
+      # Esta variable es requerida por la imagen de MySQL para establecer la contraseña del usuario root de la base de datos. 
+      # Al iniciar el contenedor, MySQL usará esta contraseña para el usuario root, lo que es esencial para la seguridad y el acceso a la base de datos.
+      MYSQL_ROOT_PASSWORD: admin
+      MYSQL_DATABASE: docker-compose-db
+      MYSQL_USER: docker-user
+      MYSQL_PASSWORD: docker-password

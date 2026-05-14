@@ -1,0 +1,13 @@
+services:
+  db:
+    image: mysql
+    container_name: my-db-env
+    ports:
+      - "3306:3306"
+    
+    # La instrucción `env_file` se utiliza para especificar un archivo que contiene variables de entorno.
+    # En este caso, se está indicando que las variables de entorno para el servicio `db` se cargarán desde un archivo llamado `common.env`.
+    # Este archivo `common.env` debe estar ubicado en el mismo directorio que el archivo `docker-compose.yml` o se debe proporcionar la ruta correcta.
+    # El archivo `common.env` es un archivo de texto que contiene pares clave-valor, donde cada línea define una variable de entorno en el formato `NOMBRE_VARIABLE=valor`.
+    env_file: 
+      - common.env
