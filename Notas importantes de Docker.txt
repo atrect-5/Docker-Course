@@ -183,6 +183,14 @@ Para una gestión eficiente y segura, se recomienda crear redes bridge definidas
 
 Un contenedor puede estar conectado a multiples redes a la vez.
 
+//// Docker compose ////
+Es una herramienta que permite orquestar multiples contenedores para que trabajen juntos como un solo servicio.
+Utiliza un archivo de configuracion en formato YAML (generalmente docker-compose.yml).
+Esto nos permite iniciar, detener y reconstruir todos los servicios simultáneamente con comandos simples.
+Facilita la creación de entornos de desarrollo locales, pruebas y despliegues rápidos que son consistentes en cualquier máquina con Docker instalado.
+
+Aunque es ideal para desarrollo local, prototipado rápido y flujos de integración continua (CI), no está diseñado para la orquestación a gran escala en producción (para lo cual se recomienda Kubernetes o Docker Swarm).
+
 ///////////////// Dockerfile Instructions //////////////////
 
 FROM    -> Define la imagen base (ej. `ubuntu:22.04`) a partir de la cual se construirá la nueva imagen. Es la primera instrucción obligatoria en un Dockerfile.
@@ -202,6 +210,20 @@ CMD     -> Proporciona un comando y/o parámetros por defecto para un contenedor
 ENTRYPOINT -> Configura un contenedor para que se ejecute como un ejecutable. A diferencia de `CMD`, los argumentos pasados a `docker run` se añaden después del `ENTRYPOINT`. Es más difícil de sobreescribir que `CMD`. Se usa a menudo en combinación con `CMD` para definir parámetros por defecto que pueden ser modificados.
             -> Exec form (recomendada): ENTRYPOINT ["executable", "param1"]
             -> Shell form: ENTRYPOINT command param1
+
+///////////////// Docker-compose Instructions //////////////////
+
+version:    -> (Opcional/Obsoleto) Especificaba la versión del formato de archivo (schema), NO la versión de tu proyecto. Actualmente no es necesario incluirla ya que Docker usa la especificación más reciente por defecto.
+services:   -> (Obligatorio) Define los servicios que componen la aplicación. Debe contener al menos un servicio definido.
+    [nombre_servicio]:  -> (Obligatorio) Es el nombre identificador del servicio (ej. `web`, `db`). Permite que otros servicios lo encuentren por nombre (DNS interno).
+        image: [nombre_imagen]  -> (Obligatorio si no se usa 'build') Especifica la imagen a descargar o usar.
+        build: [ruta]           -> (Obligatorio si no se usa 'image') Indica la ruta para construir una imagen desde un Dockerfile local.
+        ports:                  -> Define el mapeo de puertos (ej. `ports: - "8080:80"`).
+        environment:            -> Define variables de entorno para el proceso del contenedor.
+        env_file: [ruta_archivo_env] -> Especifica un archivo `.env` para cargar variables de entorno desde ese archivo en lugar de definirlas directamente en el YAML.
+        volumes:                -> Define montajes de persistencia o carpetas compartidas.
+        restart: [policy]       -> Define si el contenedor debe reiniciarse tras fallos (ej. `always`, `on-failure`).
+        container_name: [nombre_contenedor] -> Asigna un nombre personalizado al contenedor en lugar de uno generado por Compose.
 
 ///////////////// Comando importantes de Docker CLI Vistos en el curso //////////////////
 
@@ -295,7 +317,7 @@ docker network inspect [nombre_red] -> Muestra detalles sobre una red específic
 
 docker network ls -> Lista todas las redes disponibles en tu sistema.
 
-dicker network rm [nombre_red] -> Elimina una red específica. Ten en cuenta que solo puedes eliminar una red si no hay contenedores conectados a ella.
+docker network rm [nombre_red] -> Elimina una red específica. Ten en cuenta que solo puedes eliminar una red si no hay contenedores conectados a ella.
 docker network prune -> Elimina todas las redes que no están siendo utilizadas.
 
 **** Comandos de limitacion de recursos en contenedores ****
@@ -315,3 +337,16 @@ Comando de ayuda rápida: `docker run --help | grep memo/cpu`
       --cpu-rt-runtime int               -> Establece el tiempo de ejecución para la limitación de CPU real en microsegundos (predeterminado -1).
       --cpuset-cpus string               -> Asigna los CPUs específicos que el contenedor puede usar.
       --cpuset-mems string               -> Asigna las memorias específicas que el contenedor puede usar.
+
+**** Comandos para docker compose ****
+
+docker compose up -> Inicia los servicios definidos en el archivo docker-compose.yml. Si las imágenes no existen, las construirá o descargará automáticamente.
+    -d: Ejecuta los servicios en segundo plano (modo "detached").
+    --build: Fuerza la reconstrucción de las imágenes antes de iniciar los contenedores.
+    -f [ruta/archivo.yml]: Permite especificar una ruta diferente para el archivo de configuración de Docker Compose (ej. `docker compose -f ./docker-compose.dev.yml up`).
+docker compose down -> Detiene y elimina los contenedores, redes y volúmenes creados por `docker compose up`.
+    -v: Elimina también los volúmenes asociados a los servicios.
+    --remove-orphans: Elimina contenedores que no están definidos en el archivo de configuración actual pero que fueron creados por una ejecución anterior de Docker Compose.
+docker compose ps -> Lista los contenedores que están siendo gestionados por Docker Compose, mostrando su estado actual (ej. `docker compose ps`) (Debes estar en el mismo directorio que el archivo docker-compose.yml para que funcione).
+    -a: Muestra todos los contenedores, incluyendo los que están detenidos.
+    --services: Muestra solo los nombres de los servicios definidos en el archivo de configuración, sin detalles adicionales.
