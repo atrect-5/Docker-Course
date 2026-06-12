@@ -16,6 +16,11 @@ services:
     # La instrucción `image` especifica la imagen Docker que se usará para crear el contenedor del servicio. 
     # En este caso, se está utilizando la imagen oficial de Nginx disponible en Docker Hub. Esto significa que cuando se inicie el servicio `web`, Docker Compose descargará la imagen de Nginx (si no está ya presente en el host) y la usará para crear el contenedor.
     image: nginx
+    # Si se quiere construir desde un Dockerfile en lugar de una imagen ya creada, se debe usar la instrucción `build` en lugar de `image` y especificar el contexto (la ruta) donde se encuentra el Dockerfile.
+    #build:
+    #  context: .
+    #  dockerfile: Dockerfile
+    
 
     # La instrucción `container_name` permite asignar un nombre específico al contenedor creado para este servicio.
     # En este caso, se está asignando el nombre "my-site" al contenedor que se creará para el servicio `web`. 
@@ -26,6 +31,12 @@ services:
     # En este caso, se está mapeando el puerto 8080 del host al puerto 80 del contenedor. Esto significa que cualquier solicitud que llegue al puerto 8080 del host será redirigida al puerto 80 del contenedor, donde Nginx está escuchando por defecto.
     ports:
       - "8080:80"
+
+    # La instruccion `restart` se utiliza para definir la política de reinicio de un contenedor en caso de que este falle o se detenga inesperadamente.
+    # En este caso, se está utilizando la política `always`, lo que significa que Docker intentará reiniciar el contenedor automáticamente cada vez que se detenga, sin importar la razón de la detención.
+    # Esto es útil para garantizar que el servicio de base de datos MySQL esté siempre disponible, incluso si ocurre un error o si el contenedor se detiene por alguna razón.
+    # En caso de que el contenedor se detenga debido a un error, Docker intentará reiniciarlo inmediatamente. Si el contenedor se detiene manualmente (por ejemplo, con `docker stop`), Docker intentará reiniciarlo automáticamente hasta que se reinicie el daemon o el sistema.
+    restart: always
 
 # Se define otro servicio llamado `db`.
   db:
@@ -49,3 +60,6 @@ services:
       MYSQL_DATABASE: docker-compose-db
       MYSQL_USER: docker-user
       MYSQL_PASSWORD: docker-password
+
+    # En este caso, se está utilizando la política `unless-stopped`, lo que significa que Docker intentará reiniciar el contenedor automáticamente si se detiene debido a un error o falla, pero no lo reiniciará si el contenedor se detiene manualmente (por ejemplo, con `docker stop`) aunque se reinicie el sistema o el daemon.
+    restart: unless-stopped

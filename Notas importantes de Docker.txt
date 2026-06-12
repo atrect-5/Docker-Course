@@ -191,6 +191,9 @@ Facilita la creación de entornos de desarrollo locales, pruebas y despliegues r
 
 Aunque es ideal para desarrollo local, prototipado rápido y flujos de integración continua (CI), no está diseñado para la orquestación a gran escala en producción (para lo cual se recomienda Kubernetes o Docker Swarm).
 
+Cada servicio que defines en un YAML funciona como un contenedor independiente, por lo que puedes configurarlos como tal.
+Como por ejemplo, asignarles volumenes, puertos, variables de entorno, etc. a cada uno de ellos.
+
 ///////////////// Dockerfile Instructions //////////////////
 
 FROM    -> Define la imagen base (ej. `ubuntu:22.04`) a partir de la cual se construirá la nueva imagen. Es la primera instrucción obligatoria en un Dockerfile.
@@ -222,8 +225,17 @@ services:   -> (Obligatorio) Define los servicios que componen la aplicación. D
         environment:            -> Define variables de entorno para el proceso del contenedor.
         env_file: [ruta_archivo_env] -> Especifica un archivo `.env` para cargar variables de entorno desde ese archivo en lugar de definirlas directamente en el YAML.
         volumes:                -> Define montajes de persistencia o carpetas compartidas.
+        networks:               -> Define a qué redes personalizadas se conecta el servicio.
         restart: [policy]       -> Define si el contenedor debe reiniciarse tras fallos (ej. `always`, `on-failure`).
         container_name: [nombre_contenedor] -> Asigna un nombre personalizado al contenedor en lugar de uno generado por Compose.
+        command: [comando]      -> Sobrescribe el comando por defecto de la imagen para este servicio.
+        depends_on: [servicio1, servicio2] -> Define dependencias entre servicios, indicando que un servicio debe iniciarse antes que otro (ej. `depends_on: - db`).
+
+volumes:    -> Define volúmenes que pueden ser usados por los servicios (Depende de a que altura se usa la instruccion `volumes`).
+    [nombre_volumen]:  -> Define un volumen con nombre que puede ser utilizado por los servicios (ej. `db_data`).
+
+networks:   -> Define redes personalizadas para los servicios (Depende de a que altura se usa la instruccion `networks`).
+    [nombre_red]:     -> Define una red personalizada que puede ser utilizada por los servicios (ej. `frontend`, `backend`).
 
 ///////////////// Comando importantes de Docker CLI Vistos en el curso //////////////////
 
@@ -344,9 +356,17 @@ docker compose up -> Inicia los servicios definidos en el archivo docker-compose
     -d: Ejecuta los servicios en segundo plano (modo "detached").
     --build: Fuerza la reconstrucción de las imágenes antes de iniciar los contenedores.
     -f [ruta/archivo.yml]: Permite especificar una ruta diferente para el archivo de configuración de Docker Compose (ej. `docker compose -f ./docker-compose.dev.yml up`).
+    -p [nombre_proyecto]: Asigna un nombre específico al proyecto, lo que afecta el prefijo de los nombres de los contenedores, redes y volúmenes creados (ej. `docker compose -p mi-proyecto up`).
 docker compose down -> Detiene y elimina los contenedores, redes y volúmenes creados por `docker compose up`.
     -v: Elimina también los volúmenes asociados a los servicios.
     --remove-orphans: Elimina contenedores que no están definidos en el archivo de configuración actual pero que fueron creados por una ejecución anterior de Docker Compose.
+docker compose start -> Inicia los contenedores que han sido detenidos previamente con `docker compose stop` sin reconstruir las imágenes ni reiniciar los servicios.
+docker compose stop -> Detiene los contenedores sin eliminarlos, lo que permite reiniciarlos más tarde con `docker compose start` sin perder su estado.
 docker compose ps -> Lista los contenedores que están siendo gestionados por Docker Compose, mostrando su estado actual (ej. `docker compose ps`) (Debes estar en el mismo directorio que el archivo docker-compose.yml para que funcione).
     -a: Muestra todos los contenedores, incluyendo los que están detenidos.
     --services: Muestra solo los nombres de los servicios definidos en el archivo de configuración, sin detalles adicionales.
+docker compose build -> Construye o reconstruye las imágenes de los servicios definidos en el archivo docker-compose.yml.
+    --no-cache: Fuerza la construcción de las imágenes sin usar la caché, lo que puede ser útil para asegurarse de que se apliquen todos los cambios recientes en el Dockerfile.
+docker compose logs -> Muestra los logs de los contenedores gestionados por Docker Compose.
+    -f: Sigue los logs en tiempo real.
+    --tail [número]: Muestra solo las últimas n líneas de los logs para cada contenedor.

@@ -1,0 +1,25 @@
+services:
+  db:
+    image: mysql
+    container_name: my-db-net
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: admin
+      MYSQL_DATABASE: docker-compose-db
+      MYSQL_USER: docker-user
+      MYSQL_PASSWORD: docker-password
+
+    # La instruccion `networks` dentro de la configuracion de nuestro servicio le indica que nuestro servicio se debe conectar a esa red.
+    # En este caso estamos conectando nuestro servicio a la red que se crea en este mismo YAML mas adelante.
+    networks:
+      - my-db-network
+
+# La instruccion `networks` a la altura de `services`, define las redes personalizadas para los servicios. 
+# En este caso estamos indicando que se va a crear una red llamada `my-db-network` con el driver `bridge` que sera utilizada por mi servicio `my-db-net`.
+networks:
+  my-db-network:
+    driver: bridge
+
+
+  
