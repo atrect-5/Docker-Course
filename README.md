@@ -10,6 +10,7 @@ Bienvenido a mi repositorio de notas y prácticas del curso de Docker. Aquí ir�
 - [Módulo 2: Trabajando con contenedores](#módulo-2-trabajando-con-contenedores)
 - [Módulo 3: Volúmenes en Docker](#módulo-3-volúmenes-en-docker)
 - [Módulo 4: Redes en Docker](#módulo-4-redes-en-docker)
+- [Módulo 5: Docker Compose](#módulo-5-docker-compose)
 
 ---
 
@@ -331,6 +332,37 @@ Se experimentó con los modos de red avanzados:
 - **Orden de Conexión**: Si un contenedor se crea y luego se conecta a una red, mantendrá la conexión a la red original (normalmente bridge) y a la nueva, teniendo múltiples IPs.
 - **Control de IPs**: El uso del flag `--ip` permite asignar direcciones estáticas dentro de nuestras subredes, algo vital para servicios que requieren configuraciones fijas.
 - **Higiene de Redes**: Al igual que con los volúmenes, es buena práctica usar `docker network prune` para eliminar redes que ya no se utilizan y evitar conflictos de subredes en el futuro.
+
+---
+
+## Módulo 5: Docker Compose
+
+En este módulo aprendí a utilizar Docker Compose para orquestar aplicaciones multi-contenedor, permitiendo definir toda la infraestructura (servicios, redes y volúmenes) en un único archivo declarativo.
+
+### 📄 Recursos
+El detalle de los comandos y las configuraciones de cada práctica se encuentra en:
+- **[Docker Compose.md](./5-Docker%20Compose/Docker%20Compose.md)**
+
+---
+
+### 🚀 Práctica: Orquestación de Servicios
+Se trabajó en la creación de archivos `docker-compose.yml` para automatizar el despliegue de entornos complejos.
+
+**Puntos clave:**
+- **Gestión del Ciclo de Vida**: Uso de `docker compose up -d` para levantar servicios y `down` para limpiar el entorno (contenedores y redes) de forma atómica.
+- **Variables de Entorno**: Implementación de archivos `.env` (como `common.env`) para separar la configuración del código.
+- **Persistencia y Redes**: Configuración de volúmenes nombrados y redes personalizadas directamente en el YAML para asegurar la persistencia de datos y la comunicación DNS entre servicios.
+- **Políticas de Reinicio**: Uso de `restart: always` y `unless-stopped` para mejorar la disponibilidad de los servicios.
+
+---
+
+### 💡 Lecciones Aprendidas y Tips
+
+- **Definición Declarativa**: Compose elimina la necesidad de recordar comandos largos de `docker run`; todo queda documentado en el código.
+- **DNS por Servicio**: Aprendí que Compose permite que un contenedor encuentre a otro simplemente usando el nombre del servicio definido en el archivo.
+- **Portabilidad**: Un proyecto con Docker Compose es fácilmente replicable en cualquier máquina, garantizando que el entorno de desarrollo sea idéntico al de otros colaboradores.
+- **Limpieza Total**: El uso de `docker compose down -v` es fundamental cuando se desea resetear el entorno eliminando incluso la persistencia de datos.
+- **Precedencia de Flags**: Recordar que el flag `-f` (archivo personalizado) va antes del comando, mientras que `-d` (segundo plano) va después de `up`.
 
 ---
 
