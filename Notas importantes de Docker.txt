@@ -194,6 +194,19 @@ Aunque es ideal para desarrollo local, prototipado rápido y flujos de integraci
 Cada servicio que defines en un YAML funciona como un contenedor independiente, por lo que puedes configurarlos como tal.
 Como por ejemplo, asignarles volumenes, puertos, variables de entorno, etc. a cada uno de ellos.
 
+//// Docker Machine ////
+Docker machine actualmente es obsoleto y no se recomienda su uso.
+Fue archivada por Docker en julio de 2025 y ya no recibe mantenimiento ni actualizaciones de seguridad.
+
+Su función principal era provisionar y gestionar máquinas virtuales (VMs) remotas o locales para instalar y ejecutar el Docker Engine en ellas.
+Docker Machine creaba una VM en un proveedor de nube o en tu máquina local, instalaba Docker Engine en esa VM y configuraba el cliente de Docker para que se conectara a esa VM de forma remota.
+La herramienta configuraba tu terminal local para que, al ejecutar comandos de Docker (como docker run), estos se enviaran a través de la red al Docker Engine que estaba corriendo dentro de la VM remota, no en tu computadora local.
+
+Ya no se utiliza porque sus funcionalidades han sido reemplazadas por herramientas más modernas y eficientes, como:
+Docker Desktop (en Windows y macOS), que proporciona una experiencia de desarrollo más integrada y simplificada para ejecutar contenedores Docker en tu máquina local sin necesidad de gestionar máquinas virtuales separadas.
+Kubernetes o servicios gestionados de contenedores en la nube, que ofrecen capacidades de orquestación y escalabilidad más avanzadas para entornos de producción.
+Y en linux, al ser nativo, puede instalar Docker Engine directamente en el sistema operativo sin necesidad de una VM intermedia.
+
 ///////////////// Dockerfile Instructions //////////////////
 
 FROM    -> Define la imagen base (ej. `ubuntu:22.04`) a partir de la cual se construirá la nueva imagen. Es la primera instrucción obligatoria en un Dockerfile.
