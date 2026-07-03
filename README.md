@@ -12,135 +12,45 @@ Bienvenido a mi repositorio de notas y prácticas del curso de Docker. Aquí ir�
 - [Módulo 4: Redes en Docker](#módulo-4-redes-en-docker)
 - [Módulo 5: Docker Compose](#módulo-5-docker-compose)
 
+[!NOTE]
+> En el archivo de `Notas importantes de Docker.txt` se encuentran todos los comandos de la CLI y definiciones de las instrucciones del Dockerfile, asi como de los conceptos aprendidos en el curso. Este archivo es un resumen de lo aprendido y sirve como referencia rápida.
+> Cada módulo tiene su propio archivo de notas y prácticas, que se encuentran en sus respectivas carpetas.
+
 ---
 
 ## Módulo 1: Entendiendo las imágenes
 
 En este módulo introductorio, aprendí los conceptos base de la arquitectura de Docker y el ciclo de vida de las imágenes.
 
-### 🧠 Conceptos Clave
-- **Arquitectura Cliente-Servidor:** Cómo interactúan el Docker Client, el Daemon y los Registries.
-- **Imágenes vs Contenedores:** La diferencia entre la plantilla inmutable (imagen) y la instancia ejecutable (contenedor).
-- **Dockerfile:** La "receta" para construir imágenes capa por capa.
-- **.dockerignore:** Archivo para excluir archivos y directorios del contexto de construcción de la imagen, optimizando su tamaño y seguridad.
-
-### 📝 Instrucciones Clave del Dockerfile
-Estas son las instrucciones principales que he aprendido para construir imágenes:
-- `FROM`: Define la imagen base.
-- `LABEL`: Añade metadatos a la imagen (autor, sitio web, etc.).
-- `ENV`: Configura variables de entorno.
-- `WORKDIR`: Establece el directorio de trabajo dentro del contenedor.
-- `RUN`: Ejecuta comandos durante la construcción de la imagen.
-- `USER`: Cambia el usuario activo para ejecutar instrucciones (seguridad y permisos).
-- `COPY`: Copia archivos/directorios desde el host al sistema de archivos de la imagen.
-- `VOLUME`: Crea un punto de montaje para persistencia de datos (ej. logs).
-- `EXPOSE`: Documenta el puerto en el que escucha la aplicación.
-- `CMD`: Especifica el comando por defecto a ejecutar cuando el contenedor inicia.
-
 ### 📄 Recursos
-He recopilado una lista detallada de comandos de la CLI y definiciones de las instrucciones del Dockerfile en el siguiente archivo:
-- **Notas importantes de Docker.txt**
+El desarrollo detallado de los pasos seguidos, comandos ejecutados y resultados de estas prácticas se especifica en:
+- **[Entendiendo las imágenes.md](./1-Entendiendo%20las%20imagenes/Entendiendo%20las%20imagenes.md)**
+  - *Ruta:* `1-Entendiendo las imagenes\Entendiendo las imagenes.md`
+- **[Imagen con la mayoría de las instrucciones.md](./1.1-Imagen%20con%20la%20mayor%C3%ADa%20de%20las%20instrucciones/Imagen%20con%20la%20mayoria%20de%20las%20instrucciones.md)**
+  - *Ruta:* `1.1-Imagen con la mayoría de las instrucciones\Imagen con la mayoria de las instrucciones.md`
+
+Además, he recopilado una lista detallada de comandos de la CLI y definiciones de las instrucciones del Dockerfile en el siguiente archivo:
+- **[Notas importantes de Docker.txt](./Notas%20importantes%20de%20Docker.txt)**
+  - *Ruta:* `Notas importantes de Docker.txt`
+
+---
 
 ### 🚀 Práctica: Servidor Apache con Página Personalizada
-Como parte de la práctica de este módulo, se creó una imagen personalizada de Ubuntu con un servidor Apache que sirve una página web estática.
-
-**Avances Realizados:**
-1.  **`.dockerignore`**: Se ha añadido un archivo `.dockerignore` para excluir ficheros no necesarios (como `node_modules`) del contexto de construcción, optimizando así el tamaño y la seguridad de la imagen.
-2.  **`index.html`**: Se creó una página web estática con HTML y CSS interno para ser usada como página de prueba.
-3.  **Variables y Usuarios**: Se implementó lógica en el Dockerfile para generar archivos HTML dinámicamente (`variable.html`, `usuario1.html`, `usuario2.html`) demostrando el uso de `ENV` y el cambio de permisos con `USER`.
-4.  **Configuración del Servidor**: Se definieron metadatos con `LABEL`, un directorio de trabajo con `WORKDIR` y un volumen para logs con `VOLUME`.
-
-#### Cómo Replicar Este Proyecto
-
-Sigue estos pasos para construir la imagen y ejecutar el contenedor en tu propia máquina.
-
-**Paso 1: Construir la Imagen de Docker**
-
-1.  Abre una terminal.
-2.  Navega a la carpeta que contiene el `Dockerfile`:
-    ```bash
-    cd "1-Entendiendo las imagenes"
-    ```
-3.  Ejecuta el siguiente comando para construir la imagen. Le asignaremos el nombre (`-t`) `servidor-apache:1.0`.
-    ```bash
-    docker build -t servidor-apache:1.0 .
-    ```
-
-**Paso 2: Crear y Ejecutar el Contenedor**
-
-1.  Una vez construida la imagen, ejecuta este comando para iniciar un contenedor a partir de ella:
-    ```bash
-    docker run -d -p 8080:80 --name mi-servidor-web servidor-apache:1.0
-    ```
-2.  **Explicación de los flags:**
-    -   `-d` (detached): Ejecuta el contenedor en segundo plano.
-    -   `-p 8080:80`: Mapea el puerto 8080 de tu máquina (host) al puerto 80 del contenedor (donde Apache está escuchando).
-    -   `--name mi-servidor-web`: Le da un nombre fácil de recordar a tu contenedor.
-
-**Paso 3: Verificar el Resultado**
-
-1.  Abre tu navegador web preferido.
-2.  Visita la dirección `http://localhost:8080`. Deberías ver la página de bienvenida.
-3.  **Prueba los enlaces:** Haz clic en los enlaces de la página para verificar la generación de archivos mediante variables de entorno y los distintos usuarios (`root` y `alex`).
-
-**Paso 4: Detener y Eliminar el Contenedor (Opcional)**
-Cuando hayas terminado de experimentar, puedes detener y eliminar el contenedor para limpiar tu sistema:
-```bash
-# Detener el contenedor
-docker stop mi-servidor-web
-
-# Eliminar el contenedor
-docker rm mi-servidor-web
-```
+Se creó una imagen personalizada basada en Ubuntu con un servidor Apache que sirve una página web estática. Se implementó un archivo `.dockerignore` para optimizar la construcción, se configuraron variables de entorno (`ENV`) para generar contenido dinámico, y se gestionaron permisos de usuario (`USER`), directorios de trabajo (`WORKDIR`) y volúmenes (`VOLUME`) para logs.
 
 ---
 
 ### 🚀 Práctica: Servidor Nginx con Múltiples Instrucciones
+Se utilizó una imagen de `debian:latest` para construir un servidor Nginx, integrando la mayoría de las instrucciones de Dockerfile. Se aplicaron buenas prácticas como la creación de un usuario no-root (`USER alex`) para mejorar la seguridad, configuración de variables de entorno y manejo de permisos en la transferencia de archivos.
 
-Esta práctica avanzada utiliza una imagen `debian:latest` para construir un servidor Nginx. El `Dockerfile` está diseñado para demostrar el uso combinado de la mayoría de las instrucciones aprendidas, creando un entorno más realista.
+---
 
-**Avances Realizados:**
-1.  **Instalación de Nginx**: Se utiliza `RUN` para actualizar el sistema e instalar el servidor Nginx desde los repositorios de Debian.
-2.  **Gestión de Usuarios**: Se crea un usuario no-root llamado `alex` con `USER` para ejecutar comandos, mejorando la seguridad.
-3.  **Variables de Entorno y Ficheros Dinámicos**: Se usa `ENV` para crear una variable y luego se escribe en un fichero (`envi.html`) dentro del contenedor.
-4.  **Permisos y Copia de Ficheros**: Se demuestra el cambio entre `USER root` y `USER alex` para gestionar permisos en la creación y copia de ficheros (`username.html`).
-5.  **Instrucciones de Metadatos y Red**: Se emplean `LABEL`, `EXPOSE` y `VOLUME` para añadir metadatos, documentar el puerto y definir un volumen para logs.
+### 💡 Lecciones Aprendidas y Tips
 
-#### Cómo Replicar Este Proyecto
-
-**Paso 1: Construir la Imagen de Docker**
-
-1.  Abre una terminal.
-2.  Navega a la nueva carpeta de la práctica:
-    ```bash
-    cd "1.1-Imagen con la mayoría de las instrucciones"
-    ```
-3.  Ejecuta el siguiente comando para construir la imagen. El nombre será `servidor-nginx:1.0`.
-    ```bash
-    docker build -t servidor-nginx:1.0 .
-    ```
-
-**Paso 2: Crear y Ejecutar el Contenedor**
-
-1.  Una vez construida la imagen, ejecuta este comando para iniciar el contenedor:
-    ```bash
-    docker run -d -p 8081:80 --name mi-servidor-nginx servidor-nginx:1.0
-    ```
-2.  **Nota**: Usamos el puerto `8081` en el host para no entrar en conflicto con la práctica anterior.
-
-**Paso 3: Verificar el Resultado**
-
-1.  Abre tu navegador y visita `http://localhost:8081`.
-2.  **Prueba los enlaces**: Haz clic en los enlaces para verificar los ficheros `envi.html` y `username.html` generados durante la construcción de la imagen.
-
-**Paso 4: Detener y Eliminar el Contenedor (Opcional)**
-```bash
-# Detener el contenedor
-docker stop mi-servidor-nginx
-
-# Eliminar el contenedor
-docker rm mi-servidor-nginx
-```
+- **Uso de `.dockerignore`**: Es una práctica fundamental para evitar enviar archivos innecesarios (como dependencias locales o archivos temporales) al contexto de construcción de la imagen, reduciendo el tamaño y mejorando la seguridad.
+- **Seguridad con `USER`**: Evitar ejecutar contenedores como `root` siempre que sea posible. Crear un usuario de sistema y cambiar a él con `USER` es vital para el principio de menor privilegio.
+- **Optimización de Capas**: Cada instrucción `RUN`, `COPY` y `ADD` crea una nueva capa. Es recomendable agrupar comandos (por ejemplo, actualizando e instalando en un solo `RUN`) para mantener las imágenes ligeras.
+- **Diferencia entre `CMD` y `RUN`**: `RUN` se ejecuta durante el proceso de construcción de la imagen para preparar el entorno, mientras que `CMD` especifica el comando por defecto que se ejecutará cuando el contenedor inicie.
 
 ---
 
@@ -148,91 +58,35 @@ docker rm mi-servidor-nginx
 
 En este módulo, el enfoque fue totalmente práctico, trabajando directamente con imágenes oficiales del Docker Hub para desplegar servicios comunes y aprender a interactuar con ellos desde la CLI.
 
-### 🚀 Práctica: Servidor Apache (Imagen Oficial `httpd`)
-Se utilizó la imagen oficial de Apache para entender el flujo de descarga automática y exploración de archivos internos.
+### 📄 Recursos
+El desarrollo detallado de los pasos seguidos, comandos ejecutados y resultados de estas prácticas se especifica en:
+- **[Accediendo a contenedores con exec.md](./2-Trabajando%20con%20contenedores/Accediendo%20a%20contenedores%20con%20exec.md)**
+  - *Ruta:* `2-Trabajando con contenedores\Accediendo a contenedores con exec.md`
 
-**Pasos realizados:**
-1.  **Ejecución**: `docker run -d -p 80:80 --name apache-test httpd`
-2.  **Exploración**: Se usó `docker exec -it apache-test bash` para entrar al contenedor.
-3.  **Ruta de archivos**: Los archivos servidos se encuentran en `/usr/local/apache2/htdocs/`.
+---
+
+### 🚀 Práctica: Servidor Apache (Imagen Oficial `httpd`)
+Uso de la imagen oficial de Apache para comprender el flujo de descarga automática de imágenes (*pulling*) y la exploración del sistema de archivos interno del contenedor interactuando con su terminal.
 
 ---
 
 ### 🚀 Práctica: Base de Datos MySQL
-Uso de variables de entorno (`-e`) para configurar credenciales y bases de datos iniciales.
-
-**Configuración y Ejecución:**
-```bash
-docker run -d \
-  -e "MYSQL_ROOT_PASSWORD=admin" \
-  -e "MYSQL_DATABASE=docker-db" \
-  -e "MYSQL_USER=docker-user" \
-  -e "MYSQL_PASSWORD=dockerpassword" \
-  -p 3306:3306 \
-  --name mysql-test mysql
-```
-
-**Verificación:**
-1.  Acceder al cliente MySQL dentro del contenedor:
-    ```bash
-    docker exec -it mysql-test mysql -u docker-user -p
-    ```
-2.  Comprobar base de datos: `show databases;`
+Despliegue y configuración de un contenedor de MySQL utilizando variables de entorno (`-e`) para definir credenciales y verificar la creación automática de bases de datos desde la CLI.
 
 ---
 
 ### 🚀 Práctica: Base de Datos MongoDB
-Implementación de NoSQL y uso del shell moderno `mongosh`.
-
-**Pasos realizados:**
-1.  **Ejecución**: `docker run -d -p 27017:27017 --name mongo-test mongo`
-2.  **Interacción**:
-    - Para versiones actuales (6.0+): `docker exec -it mongo-test mongosh`
-    - Para versiones antiguas: `docker exec -it mongo-test mongo`
-3.  **Comando de prueba**: `show dbs` para listar bases de datos.
+Uso de bases de datos NoSQL con MongoDB y acceso interactivo a la consola mediante la herramienta moderna `mongosh` para interactuar con la base de datos.
 
 ---
 
 ### 🚀 Práctica: Administración de Usuarios (Dockerfile propio)
-Se trabajó en la seguridad y permisos del contenedor mediante la creación de un usuario no-root dentro de una imagen personalizada.
-
-**Pasos realizados:**
-1.  **Preparación**: Navegar al directorio donde se encuentra el Dockerfile:
-    ```bash
-    cd "2-Trabajando con contenedores"
-    ```
-2.  **Dockerfile**: Se utilizó una base de `ubuntu:latest`, se definió una variable de entorno y se creó el usuario `usuario-prueba`.
-3.  **Construcción**: `docker build -t ubuntu:prueba .`
-4.  **Ejecución**:
-    ```bash
-    docker run -d -it --name ubuntu-test ubuntu:prueba
-    ```
-    *Nota: Se usa `-it` para mantener el proceso de la shell activo en una imagen de SO.*
-5.  **Verificación**:
-    - Acceso por defecto: `docker exec -it ubuntu-test bash` (Inicia sesión como `usuario-prueba`).
-    - Acceso administrativo: 
-      ```bash
-      docker exec -it -u root ubuntu-test bash
-      ```
-      *Esto permite saltar la restricción del usuario por defecto para tareas de mantenimiento.*
+Creación de una imagen personalizada basada en Ubuntu para configurar un usuario no-root por defecto, aprendiendo a iniciar sesiones interactivas y a alternar con privilegios de administrador (`-u root`) desde la terminal del host.
 
 ---
 
 ### 🚀 Práctica: Limitación de Recursos
-Aprendí a restringir el uso de hardware de los contenedores para asegurar la estabilidad del sistema host y evitar el agotamiento de recursos.
-
-**Pasos realizados:**
-1.  **Monitoreo inicial**: Se revisó el consumo del contenedor `ubuntu-test` (Creado en la práctica anterior) usando `docker stats`. Se observó que, por defecto, el límite de memoria era el total disponible en el host (ej. 7.379GiB).
-2.  **Creación con límites**: Se ejecutó un nuevo contenedor basado en la misma imagen, pero restringiendo su memoria a 100MB usando el flag `-m`.
-    ```bash
-    docker run -d -ti -m "100mb" --name ubuntu-test2 ubuntu:prueba
-    ```
-3.  **Verificación**: Se compararon ambos contenedores en tiempo real:
-    ```bash
-    docker stats ubuntu-test2
-    ```
-
-**Resultado**: El campo `MEM USAGE / LIMIT` confirmó el límite de `100MiB`, demostrando que Docker gestiona correctamente el aislamiento de recursos y evita que un contenedor consuma más de lo asignado.
+Configuración de restricciones físicas en contenedores mediante límites de hardware (memoria) con el flag `-m`, y validación del consumo del sistema en tiempo real utilizando el comando `docker stats`.
 
 ---
 
@@ -241,6 +95,7 @@ Aprendí a restringir el uso de hardware de los contenedores para asegurar la es
 - **Documentación en Docker Hub**: Es vital revisar la sección "How to use this image" de cada imagen oficial, ya que ahí se especifican las variables de entorno necesarias (como en MySQL) y los puertos por defecto.
 - **Persistencia**: Aunque en estas prácticas los datos son efímeros, en entornos reales debemos usar **Volúmenes** para que la información de las bases de datos no se pierda al eliminar el contenedor.
 - **Interactividad**: El flag `-it` en `docker exec` es nuestra puerta de entrada para depurar y administrar servicios "desde adentro".
+- **Aislamiento y Seguridad**: Limitar los recursos asignados a los contenedores (CPU, memoria) y usar usuarios no-root son prácticas de producción fundamentales para garantizar la estabilidad e integridad del sistema host.
 
 ---
 
