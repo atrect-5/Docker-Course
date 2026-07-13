@@ -1,0 +1,479 @@
+# Notas Importantes de Docker
+
+## Arquitectura de Docker
+
+Docker utiliza una arquitectura de cliente-servidor:
+
+* **Docker daemon (dockerd)**
+  * El daemon (demonio) de Docker es el servicio que se ejecuta en segundo plano en tu máquina. Es responsable de:
+    * Construir imágenes Docker.
+    * Ejecutar contenedores.
+    * Gestionar volúmenes y redes.
+    * Distribuir/descargar imágenes.
+
+* **Docker client**
+  * Es la interfaz de línea de comandos (CLI) que usas para interactuar con Docker. Permite:
+    * Enviar comandos al daemon.
+    * Gestionar contenedores e imágenes.
+    * Descargar y subir imágenes.
+
+* **Docker registries**
+  * Son repositorios centralizados donde se almacenan y distribuyen imágenes Docker. El más conocido es Docker Hub, pero también pueden ser:
+    * Registros privados.
+    * Registros locales.
+
+### Flujo General
+
+```text
+Usuario ──> Docker Client ──> Docker Daemon ──> Crea/Ejecuta Contenedores
+                                   │
+                                   └──> Docker Registries (descarga/sube imágenes)
+```
+
+*(El cliente de Docker habla con el daemon de Docker, que hace el trabajo pesado de construir, ejecutar y distribuir nuestros contenedores).*
+
+El cliente y el daemon pueden estar en la misma máquina o conectados remotamente a través de la red. Esto permite flexibilidad en cómo se despliegan y gestionan los contenedores.
+
+---
+
+## Imágenes Docker
+
+Una imagen Docker es una plantilla inmutable que contiene todo lo necesario para ejecutar una aplicación, incluyendo:
+* Código fuente.
+* Bibliotecas.
+* Dependencias.
+* Configuración.
+* Scripts de inicio.
+
+Las imágenes se construyen a partir de un **Dockerfile**, que es un archivo de texto con instrucciones para crear la imagen. Cada instrucción en el Dockerfile crea una nueva capa en la imagen, lo que permite reutilizar capas comunes entre diferentes imágenes y optimizar el almacenamiento.
+
+Las imágenes se pueden compartir a través de registries, lo que facilita la distribución y el despliegue de aplicaciones en diferentes entornos.
+
+---
+
+## Contenedores
+
+Un contenedor es una instancia ejecutable de una imagen Docker.
+* Proporciona un entorno aislado para ejecutar aplicaciones, lo que significa que cada contenedor tiene su propio sistema de archivos, red y procesos, pero comparte el kernel del sistema operativo con otros contenedores.
+* Los contenedores son efímeros, lo que significa que pueden ser creados, detenidos y eliminados fácilmente. Esto los hace ideales para aplicaciones que necesitan escalar rápidamente o para entornos de desarrollo donde se requiere un ciclo de vida rápido.
+* Los contenedores pueden comunicarse entre sí a través de redes Docker, lo que permite la creación de aplicaciones distribuidas y microservicios.
+
+---
+
+## Docker Hub
+
+Es la plataforma de Docker donde puedes encontrar y compartir imágenes Docker (la versión gratuita solo permite una imagen privada, pero las demás son públicas).
+
+---
+
+## Creando nuestra imagen
+
+La manera para construir un contenedor en Docker es la siguiente:
+```text
+Definir el Dockerfile ──> Construir la imagen ──> Crear un contenedor a partir de la imagen ──> Ejecutar el contenedor
+```
+
+Primero se debe crear el Dockerfile, en este se definen las instrucciones para construir la imagen.
+Para crear un Dockerfile se debe crear un archivo sin extensión, normalmente es llamado `Dockerfile` (con "D" mayúscula). El nombre del archivo puede indicar también para qué se utilizará (`Dockerfile.dev`, `Dockerfile.prod`, etc.).
+
+Una vez que se crea el archivo con el script para generar la imagen, se debe ejecutar el comando `docker build` (ver sección de comandos importantes de la CLI de Docker). Esto creará la imagen Docker a partir del Dockerfile.
+
+> [!NOTE]
+> Cada vez que se actualice el Dockerfile, se debe volver a ejecutar el comando `docker build` para que se actualice la imagen con los cambios realizados en el Dockerfile.
+
+Cuando termine de crear la imagen, puedes comprobarlo con el comando `docker images` o `docker image ls` (ver sección de comandos importantes de la CLI de Docker). O también puedes visualizar la nueva imagen creada en Docker Desktop.
+
+### `.dockerignore`
+Es un archivo de texto que se utiliza para especificar qué archivos o directorios deben ser ignorados por Docker al construir una imagen a partir de un Dockerfile.
+Funciona de manera similar a un archivo `.gitignore`, donde se listan los archivos o directorios que no se deben incluir en el contexto de construcción de la imagen. Esto es útil para evitar incluir archivos innecesarios, sensibles o que no son relevantes para la aplicación en la imagen final, lo que puede reducir el tamaño de la imagen y mejorar la seguridad.
+El archivo `.dockerignore` se coloca en el mismo directorio que el Dockerfile y se utiliza automáticamente durante el proceso de construcción de la imagen para excluir los archivos y directorios especificados.
+
+### Dangling images
+Son imágenes que han quedado sin nombre ni etiqueta (aparecen como `<none>:<none>`). Esto ocurre normalmente cuando construyes una nueva versión de una imagen usando un tag que ya existía; la versión anterior pierde su etiqueta pero sigue ocupando espacio.
+
+---
+
+## Creando nuestro contenedor
+
+Una vez creada nuestra imagen, la usaremos para crear nuestro contenedor.
+Para esto, debemos ejecutar el comando `docker run` (ver sección de comandos importantes de la CLI de Docker).
+Cuando ejecutamos este comando, se nos muestra el ID del contenedor que se ha creado.
+Si queremos comprobar que el contenedor se ha creado correctamente, podemos ejecutar el comando `docker ps` (ver sección de comandos importantes de la CLI de Docker).
+
+Se pueden crear múltiples contenedores a partir de una sola imagen.
+
+> [!NOTE]
+> Cuando se actualiza la imagen, se debe crear un nuevo contenedor con la nueva imagen actualizada.
+
+### Puertos
+Cuando se crea un contenedor, este tiene su propia red interna y no es accesible desde el exterior por defecto.
+Para hacer que el contenedor sea accesible desde el exterior, se deben mapear los puertos del contenedor a los puertos de la máquina host utilizando la opción `-p` al ejecutar `docker run` (ej. `docker run -p 8080:80 mi-imagen`). Esto permite que las solicitudes que lleguen al puerto 8080 de la máquina host sean redirigidas al puerto 80 del contenedor, donde la aplicación está escuchando.
+
+### Nombre del contenedor
+Es recomendable asignar un nombre específico a cada contenedor utilizando la opción `--name` al ejecutar `docker run` (ej. `docker run --name mi-contenedor mi-imagen`).
+Si no se asigna un nombre, Docker generará uno aleatorio para el contenedor, lo que puede dificultar su identificación y gestión, especialmente si tienes varios contenedores en ejecución.
+Esto facilita la gestión de los contenedores, ya que puedes referirte a ellos por nombre en lugar de usar el ID del contenedor, que es más difícil de recordar y manejar.
+Si necesitas cambiar el nombre de un contenedor después de haberlo creado, puedes usar el comando `docker rename` (ej. `docker rename mi-contenedor nuevo-nombre`).
+
+### Sobrescribir el CMD de una imagen sin un Dockerfile
+El `CMD` de un Dockerfile se puede sobrescribir al ejecutar un contenedor a partir de una imagen, sin necesidad de modificar el Dockerfile.
+Para esto, se debe ejecutar el comando `docker run` (ver sección de comandos importantes de la CLI de Docker) y especificar el nuevo comando al final del comando de ejecución (ej. `docker run mi-imagen echo "Hola Mundo"`).
+Esto ejecutará el comando `echo "Hola Mundo"` en lugar del `CMD` definido en la imagen, permitiendo flexibilidad para ejecutar diferentes comandos sin necesidad de crear una nueva imagen.
+
+### Copiar archivos desde/hacia un contenedor
+Se pueden copiar archivos desde o hacia un contenedor ya creado. También se pueden copiar desde un contenedor a otro contenedor.
+* Ejemplo para copiar un archivo del host al contenedor:
+  ```bash
+  docker cp ./archivo.txt mi-contenedor:/ruta/destino/
+  ```
+* Ejemplo para copiar un archivo del contenedor al host:
+  ```bash
+  docker cp mi-contenedor:/ruta/origen/archivo.txt ./
+  ```
+
+### Limitar recursos
+Es fundamental limitar los recursos (CPU y memoria) que un contenedor puede consumir. Al crear un contenedor, este utiliza por defecto los recursos del host sin restricciones, lo que puede causar problemas si un contenedor consume más de lo debido, especialmente en servidores con recursos limitados o con múltiples contenedores activos.
+Para limitar los recursos, puedes usar opciones específicas al ejecutar `docker run`, como `-m` para limitar la memoria o `--cpus` para limitar el uso de CPU (ej. `docker run -m "100mb" --cpus="1.5" mi-imagen`).
+Esto asegura que cada contenedor solo use los recursos necesarios, evitando que un contenedor acapare toda la memoria o CPU del host, lo que mejora la estabilidad y el rendimiento general del sistema.
+
+### Destruir contenedores automáticamente
+Si un contenedor es efímero y no necesitas que persista después de su ejecución, puedes usar la opción `--rm` al ejecutar el contenedor (ej. `docker run --rm mi-imagen`).
+Esto hará que el contenedor se elimine automáticamente una vez que se detenga, lo que es útil para tareas temporales o de prueba, evitando la acumulación de contenedores detenidos que ocupan espacio y recursos en tu sistema.
+
+---
+
+## Creando una imagen desde el contenedor
+
+Hay ocasiones en las que una vez que se ha creado un contenedor, se le han hecho cambios y se desea crear una imagen a partir de ese contenedor para poder reutilizar esos cambios en otros contenedores.
+Para esto, se debe ejecutar el comando `docker commit` (ver sección de comandos importantes de la CLI de Docker). Este comando crea una nueva imagen a partir de un contenedor existente, incluyendo todos los cambios realizados en el contenedor.
+* Ejemplo:
+  ```bash
+  docker commit mi-contenedor mi-nueva-imagen:tag
+  ```
+
+---
+
+## Volúmenes en Docker
+
+Los volúmenes en Docker son una forma de persistir datos generados y utilizados por los contenedores.
+Un volumen es un directorio en el sistema de archivos del host que se monta dentro del contenedor, lo que permite que los datos persistan incluso después de que el contenedor se detenga o elimine.
+Los volúmenes son útiles para almacenar datos que deben sobrevivir al ciclo de vida de un contenedor, como bases de datos, archivos de configuración o cualquier otro tipo de datos que la aplicación necesite conservar.
+
+Existen 3 tipos de volúmenes:
+
+* **Volúmenes anónimos**
+  * Se crean automáticamente cuando se usa la instrucción `VOLUME` en un Dockerfile sin especificar un nombre. Estos volúmenes no tienen un nombre asignado y se gestionan automáticamente por Docker.
+  * Una vez creado el contenedor, Docker asigna un volumen anónimo a la ruta especificada en el Dockerfile (ej. `VOLUME ["/data"]`), lo que garantiza que los datos almacenados en esa ruta persistan incluso si el contenedor se elimina.
+  * Este tipo de volúmenes no permite compartir datos entre contenedores, ya que cada contenedor tendrá su propio volumen anónimo, pero es útil para garantizar la persistencia de datos sin necesidad de gestionar manualmente los volúmenes.
+
+* **Bind mounts**
+  * Permiten montar un directorio específico del host en el contenedor. Se especifica la ruta completa del directorio del host al usar la opción `-v` (ej. `docker run -v /ruta/host:/data mi-imagen`), lo que montará el directorio `/ruta/host` del host en el directorio `/data` dentro del contenedor.
+  * Esto es útil para desarrollo, ya que permite que los cambios realizados en el host se reflejen inmediatamente en el contenedor.
+  * Este tipo de volumen requiere cuidado para evitar problemas de seguridad o de permisos, ya que el contenedor tiene acceso directo a los archivos del host.
+
+* **Volúmenes con nombre**
+  * Son gestionados por Docker y se crean usando el comando `docker volume create`. Se montan en el contenedor usando la opción `-v` al ejecutar `docker run` (ej. `docker run -v mi-volumen:/data mi-imagen`), lo que montará el volumen `mi-volumen` en el directorio `/data` dentro del contenedor.
+  * Estos volúmenes son útiles para compartir datos entre contenedores o para mantener datos persistentes sin preocuparse por la ubicación física en el host, ya que Docker se encarga de gestionarlos.
+  * Este es como el punto medio de los otros dos, donde tenemos acceso al volumen, pero Docker aún se encarga de la gestión.
+
+Si usas la instrucción `VOLUME` en un Dockerfile, aún puedes montar un volumen con nombre o un *bind mount* al ejecutar el contenedor, lo que te da flexibilidad para elegir la mejor opción de almacenamiento según tus necesidades específicas.
+También se pueden montar varios volúmenes diferentes y de distintos tipos (*bind mounts*, volúmenes nombrados, etc.) al mismo tiempo, lo que permite una gran flexibilidad en la gestión de datos persistentes.
+
+### Dangling volumes
+Son volúmenes que ya no están asociados a ningún contenedor. Esto puede ocurrir cuando un contenedor que usaba un volumen es eliminado, pero el volumen no se elimina automáticamente, lo que puede llevar a la acumulación de volúmenes no utilizados que ocupan espacio en el sistema.
+Para eliminar los volúmenes dangling, puedes usar el comando `docker volume prune`, que eliminará todos los volúmenes que no están siendo utilizados por ningún contenedor, ayudando a liberar espacio en tu sistema.
+
+---
+
+## Redes en Docker
+
+Las redes en Docker son un componente esencial que define cómo se comunican los contenedores entre sí y con el mundo exterior, utilizando diferentes controladores para gestionar el aislamiento y la conectividad.
+
+Hay diferentes tipos de redes en Docker, cada una con sus propias características y casos de uso específicos:
+
+* **None**
+  * Es una red que no tiene conectividad, lo que significa que los contenedores conectados a esta red no pueden comunicarse entre sí ni con el host. Es útil para aplicaciones que no necesitan comunicación de red o para aislar completamente un contenedor.
+* **Bridge**
+  * Es la red predeterminada que Docker crea para los contenedores. Permite la comunicación entre contenedores en la misma red, pero no entre contenedores en diferentes redes. Es útil para aplicaciones que necesitan comunicarse entre sí dentro del mismo host.
+* **Host**
+  * Permite que los contenedores compartan la red del host, lo que significa que los contenedores pueden acceder a los puertos del host directamente. Es útil para aplicaciones que necesitan un alto rendimiento de red o que requieren acceso a servicios en el host, pero no permite ejecutar múltiples contenedores del mismo servicio simultáneamente.
+* **Overlay**
+  * Permite la comunicación entre contenedores en diferentes hosts, lo que es útil para aplicaciones distribuidas o microservicios que se ejecutan en un clúster de Docker Swarm o Kubernetes.
+* **Macvlan**
+  * Permite asignar una dirección MAC a un contenedor, lo que le permite aparecer como un dispositivo físico en la red. Es útil para aplicaciones que requieren una integración más profunda con la red, como dispositivos IoT o aplicaciones que necesitan acceso a servicios de red específicos.
+
+Docker crea automáticamente una red bridge por defecto para los contenedores, lo que permite que los contenedores se comuniquen entre sí dentro de esa red.
+Docker también permite crear redes personalizadas para organizar y aislar los contenedores según las necesidades de la aplicación, lo que facilita la gestión de la comunicación entre contenedores y mejora la seguridad al limitar el acceso a ciertos contenedores dentro de una red específica.
+
+Las redes *None*, *Host* y *Bridge* vienen predefinidas con Docker, mientras que las demás pueden ser creadas por el usuario según las necesidades de la aplicación.
+
+Para una gestión eficiente y segura, se recomienda crear redes bridge definidas por el usuario, ya que ofrecen resolución DNS automática entre contenedores y mejor aislamiento que la red bridge por defecto.
+
+Un contenedor puede estar conectado a múltiples redes a la vez.
+
+---
+
+## Docker Compose
+
+Es una herramienta que permite orquestar múltiples contenedores para que trabajen juntos como un solo servicio. Utiliza un archivo de configuración en formato YAML (generalmente `docker-compose.yml`). Esto nos permite iniciar, detener y reconstruir todos los servicios simultáneamente con comandos simples.
+Facilita la creación de entornos de desarrollo locales, pruebas y despliegues rápidos que son consistentes en cualquier máquina con Docker instalado.
+
+Aunque es ideal para desarrollo local, prototipado rápido y flujos de integración continua (CI), no está diseñado para la orquestación a gran escala en producción (para lo cual se recomienda Kubernetes o Docker Swarm).
+
+Cada servicio que defines en un archivo YAML funciona como un contenedor independiente, por lo que puedes configurarlos como tal. Por ejemplo, asignándoles volúmenes, puertos, variables de entorno, etc., a cada uno de ellos.
+
+---
+
+## Docker Machine
+
+> [!WARNING]
+> Docker Machine actualmente es obsoleto y no se recomienda su uso. Fue archivada por Docker en **julio de 2021** y ya no recibe mantenimiento ni actualizaciones de seguridad.
+
+Su función principal era provisionar y gestionar máquinas virtuales (VMs) remotas o locales para instalar y ejecutar el Docker Engine en ellas.
+Docker Machine creaba una VM en un proveedor de nube o en tu máquina local, instalaba Docker Engine en esa VM y configuraba el cliente de Docker para que se conectara a esa VM de forma remota.
+La herramienta configuraba tu terminal local para que, al ejecutar comandos de Docker (como `docker run`), estos se enviaran a través de la red al Docker Engine que estaba corriendo dentro de la VM remota, no en tu computadora local.
+
+Ya no se utiliza porque sus funcionalidades han sido reemplazadas por herramientas más modernas y eficientes, como:
+* **Docker Desktop** (en Windows y macOS), que proporciona una experiencia de desarrollo más integrada y simplificada para ejecutar contenedores Docker en tu máquina local sin necesidad de gestionar máquinas virtuales separadas.
+* **Kubernetes o servicios gestionados de contenedores** en la nube, que ofrecen capacidades de orquestación y escalabilidad más avanzadas para entornos de producción.
+* En **Linux**, al ser nativo, se puede instalar Docker Engine directamente en el sistema operativo sin necesidad de una VM intermedia.
+
+---
+
+## Docker Swarm
+
+Docker Swarm es una herramienta de orquestación de contenedores que permite crear y gestionar un clúster de nodos Docker.
+Es similar a Docker Compose, pero está diseñado para entornos de producción y permite escalar aplicaciones distribuidas de manera eficiente.
+También es similar a Kubernetes, pero con un enfoque más simple y directo para usuarios que ya están familiarizados con Docker.
+
+Docker Swarm trabaja con una arquitectura de clúster, donde los nodos pueden ser:
+
+* **Nodos manager**
+  * Son responsables de gestionar el estado del clúster, programar servicios y mantener la consistencia del clúster.
+  * Pueden aceptar solicitudes de los clientes y distribuir tareas a los nodos worker.
+  * Pueden ser múltiples para garantizar alta disponibilidad, pero solo uno actúa como líder en un momento dado.
+* **Nodos worker**
+  * Son responsables de ejecutar las tareas asignadas por los nodos manager.
+  * Cuentan con un agente que comunica su estado al nodo manager y recibe instrucciones sobre qué tareas ejecutar.
+  * Pueden ser múltiples y se pueden escalar según la carga de trabajo, permitiendo que el clúster maneje más contenedores y servicios según sea necesario.
+
+Para trabajar con Docker Swarm, es necesario crear un clúster de nodos Docker, donde el nodo que ejecuta el comando `docker swarm init` se convierte en el nodo manager del clúster y los demás nodos se unen como workers o managers utilizando un token proporcionado por el nodo manager.
+Es importante tomar en cuenta que Docker Swarm trabaja con **servicios**, a diferencia de Docker Compose que trabaja con contenedores individuales.
+Es posible aprovechar la compatibilidad de Docker Swarm con los archivos `docker-compose.yml` para lanzar *stacks*, que son colecciones de servicios que se despliegan y gestionan juntos como una sola unidad, lo que facilita la orquestación de aplicaciones complejas con múltiples contenedores y servicios interdependientes.
+
+---
+
+## Instrucciones del Dockerfile
+
+* **`FROM`**: Define la imagen base (ej. `FROM ubuntu:22.04`) a partir de la cual se construirá la nueva imagen. Es la primera instrucción obligatoria en un Dockerfile.
+* **`LABEL`**: Añade metadatos a la imagen mediante pares clave-valor (ej. `LABEL version="1.0" maintainer="alex@example.com"`). Útil para documentar, organizar o añadir licencias a las imágenes.
+* **`WORKDIR`**: Establece el directorio de trabajo para cualquier instrucción `RUN`, `CMD`, `ENTRYPOINT`, `COPY` y `ADD` que le siga. Si no existe, se creará de forma automática.
+* **`ENV`**: Establece variables de entorno (ej. `ENV APP_VERSION=1.0`). Estas variables estarán disponibles durante la construcción y para los procesos que se ejecuten dentro del contenedor.
+* **`USER`**: Establece el nombre de usuario (o UID) y opcionalmente el grupo (GID) que se utilizará para ejecutar las instrucciones siguientes (`RUN`, `CMD`, `ENTRYPOINT`) y al iniciar el contenedor. Es una buena práctica para evitar ejecutar todo como root.
+* **`RUN`**: Ejecuta un comando en una nueva capa sobre la imagen actual. Se usa para instalar paquetes, compilar código, etc. (ej. `RUN apt-get update && apt-get install -y apache2`).
+* **`COPY`**: Copia archivos o directorios desde el contexto de construcción (tu máquina) al sistema de archivos del contenedor (ej. `COPY ./mi-app /usr/src/app`).
+* **`ADD`**: Similar a `COPY`, pero con funcionalidades extra como la descompresión automática de archivos `tar` locales y la capacidad de usar URLs como origen. Se recomienda preferir `COPY` a menos que necesites estas funcionalidades específicas.
+* **`VOLUME`**: Crea un punto de montaje con el nombre especificado y lo marca para contener volúmenes montados externamente. Se usa para almacenamiento persistente de datos (ej. `VOLUME ["/data"]`).
+* **`EXPOSE`**: Informa a Docker que el contenedor escucha en los puertos de red especificados en tiempo de ejecución. No publica el puerto, solo funciona como documentación entre el creador de la imagen y el que la ejecuta (ej. `EXPOSE 80`).
+* **`CMD`**: Proporciona un comando y/o parámetros por defecto para un contenedor en ejecución. Estos parámetros pueden ser sobrescritos fácilmente al ejecutar `docker run`. Solo la última instrucción `CMD` en un Dockerfile tiene efecto.
+  * Existen dos formas de usar `CMD`: *Shell form* y *Exec form*.
+  * **Shell form**: `CMD comando param1 param2` (ej. `CMD echo "Hola Mundo"`). Ejecuta el comando a través de un shell (`/bin/sh -c`), lo que permite usar variables de entorno y redirecciones, pero inicia un proceso adicional.
+  * **Exec form**: `CMD ["executable","param1","param2"]` (ej. `CMD ["apache2ctl", "-D", "FOREGROUND"]`). Ejecuta el comando directamente sin shell intermedio, lo que es más eficiente y evita problemas con señales. Es el método recomendado para procesos que deben ser el PID 1 del contenedor.
+* **`ENTRYPOINT`**: Configura un contenedor para que se ejecute como un ejecutable. A diferencia de `CMD`, los argumentos pasados a `docker run` se añaden después del `ENTRYPOINT`. Es más difícil de sobrescribir que `CMD`. Se usa a menudo en combinación con `CMD` para definir parámetros por defecto que pueden ser modificados.
+  * **Exec form** (recomendada): `ENTRYPOINT ["executable", "param1"]`
+  * **Shell form**: `ENTRYPOINT command param1`
+
+---
+
+## Instrucciones de Docker Compose
+
+* **`version:`**: *(Opcional/Obsoleto)* Especificaba la versión del formato de archivo (schema), NO la versión de tu proyecto. Actualmente no es necesario incluirla ya que Docker usa la especificación más reciente por defecto.
+* **`services:`**: *(Obligatorio)* Define los servicios que componen la aplicación. Debe contener al menos un servicio definido.
+  * **`[nombre_servicio]:`**: *(Obligatorio)* Es el nombre identificador del servicio (ej. `web`, `db`). Permite que otros servicios lo encuentren por nombre (DNS interno).
+    * **`image: [nombre_imagen]`**: *(Obligatorio si no se usa 'build')* Especifica la imagen a descargar o usar.
+    * **`build: [ruta]`**: *(Obligatorio si no se usa 'image')* Indica la ruta para construir una imagen desde un Dockerfile local.
+    * **`ports:`**: Define el mapeo de puertos (ej. `ports: - "8080:80"`).
+    * **`environment:`**: Define variables de entorno para el proceso del contenedor.
+    * **`env_file: [ruta_archivo_env]`**: Especifica un archivo `.env` para cargar variables de entorno desde ese archivo en lugar de definirlas directamente en el YAML.
+    * **`volumes:`**: Define montajes de persistencia o carpetas compartidas.
+    * **`networks:`**: Define a qué redes personalizadas se conecta el servicio.
+    * **`restart: [policy]`**: Define si el contenedor debe reiniciarse tras fallos (ej. `always`, `on-failure`).
+    * **`container_name: [nombre_contenedor]`**: Asigna un nombre personalizado al contenedor en lugar de uno generado por Compose.
+    * **`command: [comando]`**: Sobrescribe el comando por defecto de la imagen para este servicio.
+    * **`depends_on: [servicio1, servicio2]`**: Define dependencias entre servicios, indicando que un servicio debe iniciarse antes que otro (ej. `depends_on: - db`).
+* **`volumes:`**: Define volúmenes globales que pueden ser usados por los servicios.
+  * **`[nombre_volumen]:`**: Define un volumen con nombre que puede ser utilizado por los servicios (ej. `db_data`).
+* **`networks:`**: Define redes personalizadas para los servicios.
+  * **`[nombre_red]:`**: Define una red personalizada que puede ser utilizada por los servicios (ej. `frontend`, `backend`).
+
+---
+
+## Comandos Importantes de Docker CLI
+
+Para ver todos los posibles comandos de Docker, puedes ejecutar `docker --help` o `docker [comando] --help` para obtener información específica sobre un comando y sus opciones.
+
+* **`docker pull [Nombre imagen]`**: Descarga la imagen Docker disponible en Docker Hub con ese nombre.
+* **`docker image ls` / `docker images`**: Lista las imágenes Docker que tienes disponibles.
+* **`docker search [Nombre]`**: Busca imágenes en Docker Hub que coincidan con el nombre proporcionado.
+  * **`| more`**: No es un comando de Docker. Es un "pipe" a otro comando de la terminal que permite ver la salida página por página. Útil cuando la lista de resultados es muy larga.
+
+* **`docker build -t [nombre:tag] .`**: Construye una imagen a partir de un Dockerfile.
+  * **`-t [nombre:tag]`**: Asigna un nombre y una versión (tag) a la imagen (ej. `mi-app:v1`). Si omites el tag, Docker usará `latest` por defecto.
+  * **`. (punto final)`**: Especifica el "contexto de construcción". Es la ruta a un directorio en tu máquina local que contiene el Dockerfile y los archivos necesarios para construir la imagen. El daemon de Docker recibe este contexto para ejecutar la construcción (el punto final indica que se busque el Dockerfile en la ruta actual).
+  * **`-f [ruta/Dockerfile]`**: Permite especificar una ruta diferente para el Dockerfile si no se encuentra en el contexto de construcción o si tiene un nombre diferente (ej. `docker build -t mi-app -f ./Dockerfile.dev .`).
+
+* **`docker run [opciones] [IMAGEN] [COMANDO]`**: Crea un nuevo contenedor a partir de una imagen y lo inicia. Si se especifica un `[COMANDO]`, este sobreescribe el `CMD` por defecto de la imagen.
+  * **`-d`**: Ejecuta el contenedor en segundo plano (modo "detached") e imprime el ID del contenedor.
+  * **`-p [puerto_host]:[puerto_contenedor]`**: Mapea un puerto de tu máquina a un puerto del contenedor.
+  * **`--name [nombre]`**: Asigna un nombre específico al contenedor. Si no se especifica, Docker generará uno aleatorio.
+  * **`-v [volumen_host]:[volumen_contenedor]`**: Monta un volumen del host en el contenedor para persistencia de datos.
+  * **`--rm`**: Elimina automáticamente el contenedor cuando se detiene. Útil para contenedores efímeros que no necesitan persistir después de su ejecución.
+  * **`--network [network]`**: Permite conectar el contenedor a una red (bridge por defecto si no se especifica).
+    * **`--ip [IP]`**: Asigna una dirección IP específica al contenedor dentro de la red personalizada (solo funciona si se conecta a una red personalizada con un rango de IP definido).
+
+* **`docker rename [ID/Nombre actual] [Nuevo nombre]`**: Cambia el nombre de un contenedor existente.
+
+* **`docker image ls`**: Lista las imágenes Docker disponibles en tu máquina.
+  * **`--all` o `-a`**: Muestra todas las imágenes, incluyendo las intermedias que no tienen etiquetas.
+  * **`--filter [filtro]`**: Permite filtrar las imágenes por nombre, etiqueta, etc. (ej. `docker image ls --filter=reference='mi-app*'`).
+  * **`--format [formato]`**: Personaliza la salida de la lista de imágenes usando un formato específico (ej. `docker image ls --format "{{.Repository}}:{{.Tag}}"`).
+
+* **`docker ps`**: Lista los contenedores que están en ejecución.
+  * **`--all` o `-a`**: Lista todos los contenedores (en ejecución y detenidos).
+  * **`--no-trunc`**: Muestra los IDs completos de los contenedores en lugar de truncarlos.
+* **`docker container ls`**: Lista los contenedores que están en ejecución (alternativa a `docker ps`).
+
+* **`docker stop [ID/Nombre del contenedor]`**: Detiene un contenedor en ejecución.
+* **`docker start [ID/Nombre del contenedor]`**: Inicia un contenedor que fue detenido.
+* **`docker restart [ID/Nombre del contenedor]`**: Reinicia un contenedor en ejecución.
+
+* **`docker rm [ID/Nombre del contenedor]`**: Elimina uno o más contenedores DETENIDOS.
+  * **`-f`**: Fuerza la eliminación de un contenedor en ejecución.
+* **`docker rmi [ID/Nombre de la imagen]`**: Elimina una o más imágenes. Una imagen no puede ser eliminada si un contenedor (incluso detenido) la está usando.
+
+* **`docker exec -it [ID/Nombre] [comando]`**: Ejecuta un comando dentro de un contenedor en ejecución. Muy útil para depurar (ej. `docker exec -it mi-contenedor bash`).
+  * **`-i`**: Mantiene la sesión interactiva abierta.
+  * **`-t`**: Asigna una terminal TTY para que puedas interactuar con el contenedor.
+* **`docker logs [ID/Nombre]`**: Muestra la salida (logs) de un contenedor.
+  * **`-f`**: Sigue la salida de los logs en tiempo real.
+
+* **`docker stats [ID/Nombre]`**: Muestra en tiempo real el consumo de recursos (CPU, Memoria, Red, I/O) de los contenedores. Si no se especifica nombre, muestra todos los activos.
+
+* **`docker inspect [ID/Nombre del contenedor]`**: Muestra detalles sobre un contenedor específico, incluyendo información sobre los volúmenes montados, redes, configuración, etc.
+  * **`-f`**: Permite formatear la salida para mostrar solo la información específica que deseas.
+
+* **`docker system prune`**: Elimina todos los contenedores detenidos, redes no utilizadas, imágenes "dangling" (sin etiqueta) y la caché de construcción.
+  * **`-a`**: Elimina también todas las imágenes no utilizadas (no solo las dangling).
+
+* **`docker cp [fuente] [destino]`**: Copia archivos o directorios entre el host y un contenedor, o entre dos contenedores.
+
+* **`docker commit [ID/Nombre del contenedor] [nombre_imagen:tag]`**: Crea una nueva imagen a partir de un contenedor existente, incluyendo todos los cambios realizados en el contenedor.
+
+* **`docker info`**: Muestra información detallada sobre la instalación de Docker, incluyendo el número de contenedores, imágenes, versiones, configuración del sistema, etc.
+
+### Volúmenes
+
+* **`docker volume create [nombre_volumen]`**: Crea un nuevo volumen con el nombre especificado.
+* **`docker volume ls`**: Lista todos los volúmenes disponibles en tu sistema.
+  * **`-q`**: Muestra solo los nombres de los volúmenes, sin detalles adicionales.
+* **`docker volume inspect [nombre_volumen]`**: Muestra detalles sobre un volumen específico, como su ubicación en el host y los contenedores que lo están utilizando.
+  * **`-f`**: Muestra solo la información específica que deseas.
+* **`docker volume rm [nombre_volumen]`**: Elimina un volumen específico. Solo puedes eliminar un volumen si no está siendo utilizado por ningún contenedor.
+  * **`-f`**: Fuerza la eliminación del volumen incluso si está siendo utilizado por un contenedor (no recomendado, ya que puede causar problemas de datos).
+* **`docker volume prune`**: Elimina todos los volúmenes que no están siendo utilizados por ningún contenedor. Este comando es útil para limpiar volúmenes no utilizados y liberar espacio en tu sistema.
+  * **`-a`**: Elimina todos los volúmenes sin usar, no solo los anónimos.
+  * **`-f`**: Fuerza la eliminación sin pedir confirmación.
+
+### Redes
+
+* **`docker network create [nombre_red]`**: Crea una nueva red con el nombre especificado.
+  * **`-d [driver]`**: Especifica el controlador de red a usar (ej. `bridge`, `overlay`, `macvlan`). Si no se especifica, se usará `bridge` por defecto.
+* **`docker network connect [nombre_red] [ID/Nombre del contenedor]`**: Conecta un contenedor a una red específica, permitiendo que el contenedor se comunique con otros contenedores en esa red.
+* **`docker network disconnect [nombre_red] [ID/Nombre del contenedor]`**: Desconecta un contenedor de una red específica, lo que impide que el contenedor se comunique con otros contenedores en esa red.
+* **`docker network inspect [nombre_red]`**: Muestra detalles sobre una red específica, incluyendo los contenedores conectados, la configuración de IP, el controlador de red, etc.
+  * **`-f`**: Muestra solo la información específica que deseas.
+* **`docker network ls`**: Lista todas las redes disponibles en tu sistema.
+* **`docker network rm [nombre_red]`**: Elimina una red específica. Ten en cuenta que solo puedes eliminar una red si no hay contenedores conectados a ella.
+* **`docker network prune`**: Elimina todas las redes que no están siendo utilizadas.
+
+### Limitación de Recursos
+
+* **Comando de ayuda rápida**:
+  ```bash
+  docker run --help | grep -E "memo|cpu"
+  ```
+* **`-m, --memory bytes`**: Establece el límite de memoria para el contenedor.
+* **`--memory-reservation bytes`**: Establece la reserva de memoria para el contenedor.
+* **`--memory-swap bytes`**: Establece el límite de swap para el contenedor.
+* **`--memory-swappiness int`**: Ajusta la preferencia de swappiness de la memoria del contenedor (0 a 100) (predeterminado 0).
+* **`--cpus decimal`**: Limita el número de CPUs que el contenedor puede usar (ej. `--cpus="1.5"` para permitir 1 CPU completo y la mitad de otro).
+* **`-c, --cpu-shares int`**: Establece la prioridad de CPU relativa para el contenedor (predeterminado 1024). Un valor más alto significa mayor prioridad.
+* **`--cpu-period int`**: Establece el período de tiempo para la limitación de CPU en microsegundos (predeterminado 100000).
+* **`--cpu-quota int`**: Establece la cantidad máxima de CPU que el contenedor puede usar durante el período definido por `--cpu-period`. Por ejemplo, si `--cpu-period=100000` y `--cpu-quota=200000`, el contenedor puede usar hasta 2 CPUs completos.
+* **`--cpu-rt-period int`**: Establece el período de tiempo para la limitación de CPU real en microsegundos (predeterminado 100000).
+* **`--cpu-rt-runtime int`**: Establece el tiempo de ejecución para la limitación de CPU real en microsegundos (predeterminado -1).
+* **`--cpuset-cpus string`**: Asigna los CPUs específicos que el contenedor puede usar.
+* **`--cpuset-mems string`**: Asigna las memorias específicas que el contenedor puede usar.
+
+### Docker Compose
+
+* **`docker compose up`**: Inicia los servicios definidos en el archivo `docker-compose.yml`. Si las imágenes no existen, las construirá o descargará automáticamente.
+  * **`-d`**: Ejecuta los servicios en segundo plano (modo "detached").
+  * **`--build`**: Fuerza la reconstrucción de las imágenes antes de iniciar los contenedores.
+  * **`-f [ruta/archivo.yml]`**: Permite especificar una ruta diferente para el archivo de configuración de Docker Compose (ej. `docker compose -f ./docker-compose.dev.yml up`).
+  * **`-p [nombre_proyecto]`**: Asigna un nombre específico al proyecto, lo que afecta el prefijo de los nombres de los contenedores, redes y volúmenes creados (ej. `docker compose -p mi-proyecto up`).
+* **`docker compose down`**: Detiene y elimina los contenedores, redes y volúmenes creados por `docker compose up`.
+  * **`-v`**: Elimina también los volúmenes asociados a los servicios.
+  * **`--remove-orphans`**: Elimina contenedores que no están definidos en el archivo de configuración actual pero que fueron creados por una ejecución anterior de Docker Compose.
+* **`docker compose start`**: Inicia los contenedores que han sido detenidos previamente con `docker compose stop` sin reconstruir las imágenes ni reiniciar los servicios.
+* **`docker compose stop`**: Detiene los contenedores sin eliminarlos, lo que permite reiniciarlos más tarde con `docker compose start` sin perder su estado.
+* **`docker compose ps`**: Lista los contenedores que están siendo gestionados por Docker Compose, mostrando su estado actual (ej. `docker compose ps`) (Debes estar en el mismo directorio que el archivo `docker-compose.yml` para que funcione).
+  * **`-a`**: Muestra todos los contenedores, incluyendo los que están detenidos.
+  * **`--services`**: Muestra solo los nombres de los servicios definidos en el archivo de configuración, sin detalles adicionales.
+* **`docker compose build`**: Construye o reconstruye las imágenes de los servicios definidos en el archivo `docker-compose.yml`.
+  * **`--no-cache`**: Fuerza la construcción de las imágenes sin usar la caché, lo que puede ser útil para asegurarse de que se apliquen todos los cambios recientes en el Dockerfile.
+* **`docker compose logs`**: Muestra los logs de los contenedores gestionados por Docker Compose.
+  * **`-f`**: Sigue los logs en tiempo real.
+  * **`--tail [número]`**: Muestra solo las últimas n líneas de los logs para cada contenedor.
+
+### Docker Swarm
+
+* **`docker swarm init`**: Inicializa un nuevo clúster de Docker Swarm en el nodo actual, convirtiéndolo en un nodo manager. Esto permite que el nodo gestione servicios y nodos worker dentro del clúster.
+  * **`--advertise-addr [IP]`**: Especifica la dirección IP que otros nodos usarán para comunicarse con este nodo manager. Si no se especifica, Docker intentará determinar automáticamente la mejor dirección IP.
+  * **`--listen-addr [IP]`**: Especifica la dirección IP y el puerto en el que el nodo manager escuchará las solicitudes entrantes de otros nodos. Por defecto, escucha en todas las interfaces en el puerto 2377.
+  * **`--force-new-cluster`**: Fuerza la creación de un nuevo clúster, incluso si ya existe uno. Esto puede ser útil para reiniciar un clúster existente o resolver problemas de configuración.
+* **`docker swarm join`**: Permite que un nodo se una a un clúster de Docker Swarm existente como nodo worker o manager, según el token proporcionado.
+  * **`--token [token]`**: Especifica el token de autenticación necesario para unirse al clúster. Este token se obtiene del nodo manager al ejecutar `docker swarm join-token worker` o `docker swarm join-token manager`.
+  * **`--advertise-addr [IP]`**: Especifica la dirección IP que este nodo anunciará a otros nodos del clúster para la comunicación. Si no se especifica, Docker intentará determinar automáticamente la mejor dirección IP.
+  * **`--listen-addr [IP]`**: Especifica la dirección IP y el puerto en el que este nodo escuchará las solicitudes entrantes de otros nodos. Por defecto, escucha en todas las interfaces en el puerto 2377.
+* **`docker swarm join-token`**: Muestra el token de autenticación necesario para que un nodo se una al clúster como worker o manager.
+  * **`worker`**: Muestra el token para unirse como nodo worker.
+  * **`manager`**: Muestra el token para unirse como nodo manager.
+* **`docker swarm leave`**: Permite que un nodo abandone el clúster de Docker Swarm al que pertenece. Si el nodo es un manager, se recomienda transferir la función de manager a otro nodo antes de abandonar el clúster para evitar problemas de gestión.
+  * **`--force`**: Fuerza al nodo a abandonar el clúster incluso si es un nodo manager y no hay otros managers disponibles. Esto puede causar pérdida de datos o inconsistencias en el clúster, por lo que se debe usar con precaución.
+
+* **`docker node ls`**: Lista todos los nodos que forman parte del clúster de Docker Swarm, mostrando información como el ID del nodo, su estado, rol (manager o worker) y la versión de Docker que están ejecutando.
+  * **`-q`**: Muestra solo los IDs de los nodos, sin detalles adicionales.
+* **`docker node inspect [ID/Nombre del nodo]`**: Muestra detalles sobre un nodo específico en el clúster, incluyendo su estado, rol, etiquetas y cualquier error que haya ocurrido.
+  * **`-f`**: Permite filtrar la salida para mostrar solo la información específica que deseas.
+
+* **`docker service create`**: Crea un nuevo servicio en el clúster de Docker Swarm, especificando la imagen a usar y las opciones de configuración.
+  * **`--name [nombre_servicio]`**: Asigna un nombre al servicio para identificarlo fácilmente dentro del clúster.
+  * **`--replicas [número]`**: Define el número de réplicas del servicio que se ejecutarán en el clúster. Esto permite escalar la aplicación según la demanda.
+  * **`--publish [puerto_host]:[puerto_contenedor]`**: Mapea un puerto del host al puerto del contenedor, permitiendo el acceso externo al servicio.
+  * **`--network [nombre_red]`**: Conecta el servicio a una red específica dentro del clúster, facilitando la comunicación entre servicios.
+  * **`--env [variable=valor]`**: Establece variables de entorno para los contenedores que forman parte del servicio, permitiendo configurar su comportamiento.
+* **`docker service ls`**: Lista todos los servicios que se están ejecutando en el clúster de Docker Swarm, mostrando información como el ID del servicio, su nombre, el número de réplicas y el estado actual.
+  * **`-q`**: Muestra solo los IDs de los servicios, sin detalles adicionales.
+* **`docker service ps [nombre_servicio]`**: Muestra las tareas (contenedores) que forman parte de un servicio específico, incluyendo su estado, nodo en el que se ejecutan y cualquier error que haya ocurrido.
+  * **`-f`**: Permite filtrar la salida según criterios específicos, como el estado de las tareas (ej. `docker service ps -f "desired-state=running" mi-servicio`).
+* **`docker service update [nombre_servicio]`**: Permite actualizar la configuración de un servicio existente, como cambiar la imagen, el número de réplicas o las variables de entorno.
+  * **`--image [nueva_imagen]`**: Actualiza la imagen utilizada por el servicio, lo que puede ser útil para desplegar nuevas versiones de la aplicación.
+  * **`--replicas [nuevo_número]`**: Cambia el número de réplicas del servicio, permitiendo escalar hacia arriba o hacia abajo según la demanda.
+  * **`--env-add [variable=valor]`**: Añade nuevas variables de entorno al servicio sin eliminar las existentes.
+  * **`--env-rm [variable]`**: Elimina variables de entorno específicas del servicio.
+* **`docker service logs [nombre_servicio]`**: Muestra los logs de todos los contenedores que forman parte de un servicio específico, permitiendo monitorear su comportamiento y depurar problemas.
+  * **`-f`**: Sigue los logs en tiempo real, mostrando nuevas entradas a medida que se generan.
+* **`docker service scale [nombre_servicio]=[número_replicas]`**: Ajusta el número de réplicas de un servicio en ejecución, permitiendo escalar la aplicación hacia arriba o hacia abajo según la demanda.
+* **`docker service rollback [nombre_servicio]`**: Revierte un servicio a su versión anterior, deshaciendo cualquier actualización reciente y restaurando la configuración previa del servicio.
+* **`docker service rm [nombre_servicio]`**: Elimina un servicio del clúster de Docker Swarm, deteniendo todos los contenedores asociados y liberando los recursos utilizados por el servicio.

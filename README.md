@@ -2,8 +2,6 @@
 
 Bienvenido a mi repositorio de notas y prácticas del curso de Docker. Aquí iré documentando los conceptos fundamentales y comandos que vaya aprendiendo.
 
-> **Estado:** 🚧 En curso
-
 ## 📖 Tabla de Contenidos
 
 - [Módulo 1: Entendiendo las imágenes](#módulo-1-entendiendo-las-imágenes)
