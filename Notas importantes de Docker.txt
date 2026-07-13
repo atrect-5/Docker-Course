@@ -207,6 +207,25 @@ Docker Desktop (en Windows y macOS), que proporciona una experiencia de desarrol
 Kubernetes o servicios gestionados de contenedores en la nube, que ofrecen capacidades de orquestación y escalabilidad más avanzadas para entornos de producción.
 Y en linux, al ser nativo, puede instalar Docker Engine directamente en el sistema operativo sin necesidad de una VM intermedia.
 
+//// Docker Swarm ////
+Docker Swarm es una herramienta de orquestación de contenedores que permite crear y gestionar un clúster de nodos Docker.
+Es similar a Docker Compose, pero está diseñado para entornos de producción y permite escalar aplicaciones distribuidas de manera eficiente.
+Tambien es similar a Kubernetes, pero con un enfoque más simple y directo para usuarios que ya están familiarizados con Docker.
+
+Docker swarm trabaja con una arquitectura de clúster, donde los nodos pueden ser:
+- Nodos manager
+    -> Son responsables de gestionar el estado del clúster, programar servicios y mantener la consistencia del clúster.
+    -> Pueden aceptar solicitudes de los clientes y distribuir tareas a los nodos worker.
+    -> Pueden ser múltiples para garantizar alta disponibilidad, pero solo uno actúa como líder en un momento dado.
+- Nodos worker 
+    -> Son responsables de ejecutar las tareas asignadas por los nodos manager.
+    -> Cuentan con un agente que comunica su estado al nodo manager y recibe instrucciones sobre qué tareas ejecutar.
+    -> Pueden ser múltiples y se pueden escalar según la carga de trabajo, permitiendo que el clúster maneje más contenedores y servicios según sea necesario.
+
+Para trabajar con Docker Swarm, es necesario crear un clúster de nodos Docker, donde el nodo que ejecuta el comando `docker swarm init` se convierte en el nodo manager del clúster y los demás nodos se unen como workers o managers utilizando un token proporcionado por el nodo manager.
+Es importante tomar en cuanta que Docker Swarm trabaja con servicios, a diferencia de Docker Compose que trabaja con contenedores individuales.
+Puede ser posible aprovechar la compatibilidad de Docker Swarm con los ficheros docker-compose.yml, para lanzar stacks, que son colecciones de servicios que se despliegan y gestionan juntos como una sola unidad, lo que facilita la orquestación de aplicaciones complejas con múltiples contenedores y servicios interdependientes.
+
 ///////////////// Dockerfile Instructions //////////////////
 
 FROM    -> Define la imagen base (ej. `ubuntu:22.04`) a partir de la cual se construirá la nueva imagen. Es la primera instrucción obligatoria en un Dockerfile.
@@ -383,3 +402,45 @@ docker compose build -> Construye o reconstruye las imágenes de los servicios d
 docker compose logs -> Muestra los logs de los contenedores gestionados por Docker Compose.
     -f: Sigue los logs en tiempo real.
     --tail [número]: Muestra solo las últimas n líneas de los logs para cada contenedor.
+
+**** Comandos para docker swarm **** 
+
+docker swarm init -> Inicializa un nuevo clúster de Docker Swarm en el nodo actual, convirtiéndolo en un nodo manager. Esto permite que el nodo gestione servicios y nodos worker dentro del clúster.
+    --advertise-addr [IP]: Especifica la dirección IP que otros nodos usarán para comunicarse con este nodo manager. Si no se especifica, Docker intentará determinar automáticamente la mejor dirección IP.
+    --listen-addr [IP]: Especifica la dirección IP y el puerto en el que el nodo manager escuchará las solicitudes entrantes de otros nodos. Por defecto, escucha en todas las interfaces en el puerto 2377.
+    --force-new-cluster: Fuerza la creación de un nuevo clúster, incluso si ya existe uno. Esto puede ser útil para reiniciar un clúster existente o resolver problemas de configuración.
+docker swarm join -> Permite que un nodo se una a un clúster de Docker Swarm existente como nodo worker o manager, según el token proporcionado.
+    --token [token]: Especifica el token de autenticación necesario para unirse al clúster. Este token se obtiene del nodo manager al ejecutar `docker swarm join-token worker` o `docker swarm join-token manager`.
+    --advertise-addr [IP]: Especifica la dirección IP que este nodo anunciará a otros nodos del clúster para la comunicación. Si no se especifica, Docker intentará determinar automáticamente la mejor dirección IP.
+    --listen-addr [IP]: Especifica la dirección IP y el puerto en el que este nodo escuchará las solicitudes entrantes de otros nodos. Por defecto, escucha en todas las interfaces en el puerto 2377.
+docker swarm join-token -> Muestra el token de autenticación necesario para que un nodo se una al clúster como worker o manager.
+    worker: Muestra el token para unirse como nodo worker.
+    manager: Muestra el token para unirse como nodo manager.
+docker swarm leave -> Permite que un nodo abandone el clúster de Docker Swarm al que pertenece. Si el nodo es un manager, se recomienda transferir la función de manager a otro nodo antes de abandonar el clúster para evitar problemas de gestión.
+    --force: Fuerza al nodo a abandonar el clúster incluso si es un nodo manager y no hay otros managers disponibles. Esto puede causar pérdida de datos o inconsistencias en el clúster, por lo que se debe usar con precaución.
+
+docker node ls -> Lista todos los nodos que forman parte del clúster de Docker Swarm, mostrando información como el ID del nodo, su estado, rol (manager o worker) y la versión de Docker que están ejecutando.
+    -q: Muestra solo los IDs de los nodos, sin detalles adicionales.
+docker node inspect [ID/Nombre del nodo] -> Muestra detalles sobre un nodo específico en el clúster, incluyendo su estado, rol, etiquetas y cualquier error que haya ocurrido.
+    -f: Permite filtrar la salida para mostrar solo la información específica que deseas.
+
+docker service create -> Crea un nuevo servicio en el clúster de Docker Swarm, especificando la imagen a usar y las opciones de configuración.
+    --name [nombre_servicio]: Asigna un nombre al servicio para identificarlo fácilmente dentro del clúster.
+    --replicas [número]: Define el número de réplicas del servicio que se ejecutarán en el clúster. Esto permite escalar la aplicación según la demanda.
+    --publish [puerto_host]:[puerto_contenedor]: Mapea un puerto del host al puerto del contenedor, permitiendo el acceso externo al servicio.
+    --network [nombre_red]: Conecta el servicio a una red específica dentro del clúster, facilitando la comunicación entre servicios.
+    --env [variable=valor]: Establece variables de entorno para los contenedores que forman parte del servicio, permitiendo configurar su comportamiento.
+docker service ls -> Lista todos los servicios que se están ejecutando en el clúster de Docker Swarm, mostrando información como el ID del servicio, su nombre, el número de réplicas y el estado actual.
+    -q: Muestra solo los IDs de los servicios, sin detalles adicionales.
+docker service ps [nombre_servicio] -> Muestra las tareas (contenedores) que forman parte de un servicio específico, incluyendo su estado, nodo en el que se ejecutan y cualquier error que haya ocurrido.
+    -f: Permite filtrar la salida según criterios específicos, como el estado de las tareas (ej. `docker service ps -f "desired-state=running" mi-servicio`).
+docker service update [nombre_servicio] -> Permite actualizar la configuración de un servicio existente, como cambiar la imagen, el número de réplicas o las variables de entorno.
+    --image [nueva_imagen]: Actualiza la imagen utilizada por el servicio, lo que puede ser útil para desplegar nuevas versiones de la aplicación.
+    --replicas [nuevo_número]: Cambia el número de réplicas del servicio, permitiendo escalar hacia arriba o hacia abajo según la demanda.
+    --env-add [variable=valor]: Añade nuevas variables de entorno al servicio sin eliminar las existentes.
+    --env-rm [variable]: Elimina variables de entorno específicas del servicio.
+docker service logs [nombre_servicio] -> Muestra los logs de todos los contenedores que forman parte de un servicio específico, permitiendo monitorear su comportamiento y depurar problemas.
+    -f: Sigue los logs en tiempo real, mostrando nuevas entradas a medida que se generan.
+docker service scale [nombre_servicio]=[número_replicas] -> Ajusta el número de réplicas de un servicio en ejecución, permitiendo escalar la aplicación hacia arriba o hacia abajo según la demanda.
+docker service rollback [nombre_servicio] -> Revierte un servicio a su versión anterior, deshaciendo cualquier actualización reciente y restaurando la configuración previa del servicio.
+docker service rm [nombre_servicio] -> Elimina un servicio del clúster de Docker Swarm, deteniendo todos los contenedores asociados y liberando los recursos utilizados por el servicio.

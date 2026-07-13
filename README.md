@@ -11,6 +11,7 @@ Bienvenido a mi repositorio de notas y prácticas del curso de Docker. Aquí ir�
 - [Módulo 3: Volúmenes en Docker](#módulo-3-volúmenes-en-docker)
 - [Módulo 4: Redes en Docker](#módulo-4-redes-en-docker)
 - [Módulo 5: Docker Compose](#módulo-5-docker-compose)
+- [Módulo 6: Docker Swarm](#módulo-6-docker-swarm)
 
 [!NOTE]
 > En el archivo de `Notas importantes de Docker.txt` se encuentran todos los comandos de la CLI y definiciones de las instrucciones del Dockerfile, asi como de los conceptos aprendidos en el curso. Este archivo es un resumen de lo aprendido y sirve como referencia rápida.
@@ -218,6 +219,41 @@ Se trabajó en la creación de archivos `docker-compose.yml` para automatizar el
 - **Portabilidad**: Un proyecto con Docker Compose es fácilmente replicable en cualquier máquina, garantizando que el entorno de desarrollo sea idéntico al de otros colaboradores.
 - **Limpieza Total**: El uso de `docker compose down -v` es fundamental cuando se desea resetear el entorno eliminando incluso la persistencia de datos.
 - **Precedencia de Flags**: Recordar que el flag `-f` (archivo personalizado) va antes del comando, mientras que `-d` (segundo plano) va después de `up`.
+
+---
+
+## Módulo 6: Docker Swarm
+
+En este módulo aprendí los fundamentos de la orquestación nativa de contenedores con Docker Swarm, creando clústeres de un solo nodo y gestionando el ciclo de vida completo de los servicios distribuidos.
+
+### 📄 Recursos
+El desarrollo detallado de los pasos seguidos, comandos ejecutados y resultados de estas prácticas se especifica en:
+- **[Docker Swarm.md](./6-Docker%20Swarm/Docker%20Swarm.md)**
+  - *Ruta:* `6-Docker Swarm\Docker Swarm.md`
+
+---
+
+### 🚀 Práctica: Inicialización del Clúster y Verificación
+Se inicializó un clúster Swarm (`docker swarm init`) convirtiendo el nodo actual en manager, y se exploraron los comandos para añadir trabajadores y administradores. Se validó el estado de los nodos con `docker node ls`.
+
+---
+
+### 🚀 Práctica: Creación, Escalado y Balanceo de Carga
+Se desplegó un servicio de Nginx con 3 réplicas (`docker service create`) y se comprobó cómo se distribuye automáticamente la carga mediante peticiones repetidas con `curl` monitoreando los logs en tiempo real (`docker service logs`). Además, se realizó el escalado a 5 réplicas dinámicamente (`docker service scale`).
+
+---
+
+### 🚀 Práctica: Rolling Update y Rollback
+Se simuló la actualización gradual de la imagen de un servicio en producción (`docker service update`) para evitar tiempos de inactividad, y se demostró cómo revertir los cambios de forma segura a su estado anterior en caso de fallos (`docker service rollback`).
+
+---
+
+### 💡 Lecciones Aprendidas y Tips
+
+- **Servicios vs Contenedores**: En Docker Swarm no interactuamos directamente con contenedores individuales, sino con servicios (`services`), que a su vez gestionan y distribuyen las réplicas en forma de tareas a lo largo del clúster.
+- **Balanceo de Carga Integrado**: Swarm gestiona de manera transparente el enrutamiento y balanceo de carga (Ingress Routing Mesh), distribuyendo las peticiones entre los nodos activos de forma automática.
+- **Actualizaciones Graduales**: Las actualizaciones rolling updates garantizan que las réplicas se actualicen de manera escalonada, manteniendo el servicio siempre disponible para el usuario final.
+- **Limpieza de Recursos**: Para salir de un clúster Swarm (desmantelando el clúster si es un nodo manager) se debe ejecutar `docker swarm leave --force`, lo que limpia todo el estado y configuración en el host.
 
 ---
 
