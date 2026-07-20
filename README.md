@@ -11,7 +11,7 @@ Bienvenido a mi repositorio de notas y prácticas del curso de Docker. Aquí ir�
 - [Módulo 5: Docker Compose](#módulo-5-docker-compose)
 - [Módulo 6: Docker Swarm](#módulo-6-docker-swarm)
 
-[!NOTE]
+> [!NOTE]
 > En el archivo de `Notas importantes de Docker.txt` se encuentran todos los comandos de la CLI y definiciones de las instrucciones del Dockerfile, asi como de los conceptos aprendidos en el curso. Este archivo es un resumen de lo aprendido y sirve como referencia rápida.
 > Cada módulo tiene su propio archivo de notas y prácticas, que se encuentran en sus respectivas carpetas.
 
